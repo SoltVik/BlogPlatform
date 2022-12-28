@@ -1,0 +1,147 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: Blogging Platform Rest API
+
+tags:
+  - name: MessageRest
+    description: Blogging platform rest CRUD API
+
+paths:
+
+  /add:
+    post:
+      tags:
+        - MessageRest
+      summary: Add one message
+      description: Add one message
+      operationId: add
+      requestBody:
+        description: Data for message
+        required: true
+        content:
+         application/json:
+           schema:
+             type: MessageVO
+      responses:
+        '201':
+          description: Successful operation'
+          content:
+            application/json:
+              schema:
+                type: MessageVO
+        '404':
+          description: Request failed - No items
+
+  /getAll:
+    get:
+      tags:
+        - MessageRest
+      summary: Get all records
+      description: Get all records
+      operationId: getAll
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: MessageVO
+
+        '404':
+          description: Request failed - No items
+
+  /get/{id}:
+    get:
+      tags:
+        - MessageRest
+      summary: Get one record by id
+      description: Get one record by id
+      operationId: get
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: MessageVO
+        '404':
+          description: Request failed - No items
+
+  /getAllByParent/{id}:
+    get:
+      tags:
+        - MessageRest
+      summary: Get all records by parent id
+      description: Get all records by parent id
+      operationId: getByParent
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: MessageVO
+        '404':
+          description: Request failed - No items
+
+  /update/{id}:
+    put:
+      tags:
+        - MessageRest
+      summary: Update one record
+      description: Update one record
+      operationId: update
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Data to update
+        required: true
+        content:
+          'application/json':
+            schema:
+              type: MessageVO
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: MessageVO
+        '404':
+          description: Request failed - No items
+
+  /delete/{id}:
+    delete:
+      tags:
+        - MessageRest
+      summary: Delete one record by id
+      description: Delete one record by id
+      operationId: delete
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: Successful deleted
+        '404':
+          description: Request failed - No items
+
+
+components:
+  parameters:
+    id:
+      in: path
+      name: id
+      required: true
+      description: record id
+      schema:
+        type: integer

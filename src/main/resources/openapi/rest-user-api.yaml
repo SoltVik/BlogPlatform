@@ -1,0 +1,124 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: Blogging Platform Rest API
+
+tags:
+  - name: UserRest
+    description: Blogging platform rest CRUD API
+
+paths:
+
+  /add:
+    post:
+      tags:
+        - UserRest
+      summary: Add one user
+      description: Add one user
+      operationId: add
+      requestBody:
+        description: Data for user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: UserVO
+      responses:
+        '201':
+          description: Successful operation'
+          content:
+            application/json:
+              schema:
+                type: UserVO
+        '404':
+          description: Request failed - No items
+
+  /getAll:
+    get:
+      tags:
+        - UserRest
+      summary: Get all records
+      description: Get all records
+      operationId: getAll
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: UserVO
+        '404':
+          description: Request failed - No items
+
+  /get/{id}:
+    get:
+      tags:
+        - UserRest
+      summary: Get one record by id
+      description: Get one record by id
+      operationId: get
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: UserVO
+        '404':
+          description: Request failed - No items
+
+  /update/{id}:
+    put:
+      tags:
+        - UserRest
+      summary: Update one record
+      description: Update one record
+      operationId: update
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Data to update
+        required: true
+        content:
+          'application/json':
+            schema:
+              type: UserVO
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: UserVO
+        '404':
+          description: Request failed - No items
+
+  /delete/{id}:
+    delete:
+      tags:
+        - UserRest
+      summary: Delete one record by id
+      description: Delete one record by id
+      operationId: delete
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: Successful deleted
+        '404':
+          description: Request failed - No items
+
+components:
+  parameters:
+    id:
+      in: path
+      name: id
+      required: true
+      description: record id
+      schema:
+        type: integer

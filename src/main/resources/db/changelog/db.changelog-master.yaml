@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - property:
+      name: type.text
+      value: text
+  - include:
+     file: db/changelog/db.blogging-platform-1.0.xml

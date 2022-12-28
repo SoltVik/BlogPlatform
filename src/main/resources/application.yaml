@@ -1,0 +1,28 @@
+server:
+  port: 8090
+
+spring:
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  jpa:
+    hibernate:
+      show-sql: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/platform
+    username: postgres
+    password: root
+  thymeleaf:
+    cache: false
+    check-template: true
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    encoding: UTF-8
+
+logging:
+  loggingXml: false
+  file:
+    name: blogging-platform.log

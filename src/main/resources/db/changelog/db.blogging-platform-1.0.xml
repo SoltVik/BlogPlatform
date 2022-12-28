@@ -1,0 +1,55 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet author="Solvik" id="#1">
+        <createTable tableName="messages">
+            <column name="message_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="text" type="text">
+                <constraints nullable="false" />
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_create" type="datetime" defaultValueDate="current_datetime">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_edit" type="datetime" defaultValue="null">
+                <constraints nullable="true" />
+            </column>
+            <column name="date_delete" type="datetime" defaultValue="null">
+                <constraints nullable="true" />
+            </column>
+            <column name="author_id" type="int" defaultValueNumeric="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="editor_id" type="int" defaultValueNumeric="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="parent_id" type="int" defaultValueNumeric="0">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createTable tableName="users">
+            <column name="user_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="password" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="email" type="varchar(255)" defaultValue="null">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_admin" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
