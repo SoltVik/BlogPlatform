@@ -1,60 +1,66 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Blog Platform</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Blog Platform</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
 </head>
-
 <body>
 
-<div class="col-md-12" th:each ="post : ${posts.content}">
-  <div class="blog-entry ftco-animate d-md-flex">
-    <div class="text text-2 pl-md-4">
-      <h3 class="mb-2" th:utext="${post.title}">...</h3>
-      <div class="meta-wrap">
-        <p class="meta">
-          <span th:text="${#dates.format(post.dateCreate, 'MMM dd, yyyy HH:mm')}">...</span>
-          <span>Comments: <i th:utext="${service.countChildByParent(post.id)}">...</i></span>
-        </p>
-      </div>
-      <p class="mb-4" th:utext="${#strings.abbreviate(post.text,100)}">...</p>
-      <p><a th:href="@{/post/{id}(id=${post.Id})}" class="btn-custom">Read More</a></p>
+<div class="container-fluid" style="max-width: 900px; margin: 0 auto;">
+    <div class="col-md-12" th:each="post : ${posts.content}">
+        <div class="blog-entry  d-md-flex">
+            <div class="text text-2 pl-md-4">
+                <h3 class="mb-2" th:utext="${post.title}">...</h3>
+                <div class="meta-wrap">
+                    <p class="meta">
+                        <span th:text="${#dates.format(post.dateCreate, 'MMM dd, yyyy HH:mm')}"><i
+                                class="icon-calendar mr-2"></i>...</span>
+                        <span><i class="icon-comment2 mr-2"></i>Comments: <i
+                                th:utext="${service.countChildByParent(post.id)}">...</i></span>
+                    </p>
+                </div>
+                <p class="mb-4" th:utext="${#strings.abbreviate(post.text,100)}">...</p>
+                <p><a th:href="@{/post/{id}(id=${post.Id})}" class="btn-custom">Read More <span
+                        class="ion-ios-arrow-forward"></span></a></p>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <nav aria-label="Pagination" th:if="${totalPages > 0}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" title='First Page' th:href="@{/posts(page=1)}"> << </a>
+            </li>
+            <li class="page-item font-weight-bold" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" title='Previous Page' th:href="@{/posts(page=${currentPage - 1})}">Prev</a>
+            </li>
+            <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
+                <a class="page-link" href="#">...</a>
+            </li>
+            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+                th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
+                <a class="page-link" title='Page ${page}' th:href="@{/posts(page=${page})}">[[${page}]]</a>
+            </li>
+            <li class="page-item disabled" th:if="${currentPage + 2 < totalPages}">
+                <a class="page-link" href="#">...</a>
+            </li>
+            <li class="page-item font-weight-bold" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link" title='Next Page' th:href="@{/posts(page=${currentPage + 1})}">Next</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link" title='Last Page' th:href="@{/posts(page=${totalPages})}"> >> </a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
-<nav aria-label="Pagination" th:if="${totalPages > 0}">
-  <ul class="pagination justify-content-center">
-    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-      <a title='First Page' th:href="@{/posts(page=1)}"> <<  </a>
-    </li>
-    <li class="page-item font-weight-bold" th:classappend="${currentPage == 1} ? 'disabled'">
-      <a title='Previous Page' th:href="@{/posts(page=${currentPage - 1})}">Prev</a>
-    </li>
-    <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
-      <a class="page-link" href="#">...</a>
-    </li>
-
-    <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
-        th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
-      <a title='Page ${page}' th:href="@{/posts(page=${page})}">Page  [[${page}]]</a>
-    </li>
-
-    <li class="page-item disabled" th:if="${currentPage + 2 < totalPages}">
-      <a class="page-link" href="#">...</a>
-    </li>
-
-    <li class="page-item font-weight-bold" th:classappend="${currentPage == totalPages} ? 'disabled'">
-      <a title='Next Page' th:href="@{/posts(page=${currentPage + 1})}">Next</a>
-    </li>
-    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-      <a title='Last Page' th:href="@{/posts(page=${totalPages})}"> >> </a>
-    </li>
-  </ul>
-</nav>
 
 </body>
 </html>
