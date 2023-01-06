@@ -1,6 +1,8 @@
 package platform.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import platform.controller.vo.MessageVO;
 import platform.domain.Message;
@@ -19,6 +21,9 @@ public class MessageService {
 
     public List<Message> getAll() {
         return messageRepository.findAll();
+    }
+    public Page<Message> findAll(Pageable pageable) {
+        return messageRepository.findAll(pageable);
     }
 
     public void add(Message message) {
