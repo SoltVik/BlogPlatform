@@ -7,10 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import platform.domain.Message;
 import platform.service.MessageService;
+
+import java.util.List;
 
 
 @Controller
@@ -50,6 +53,24 @@ public class PlatformController {
         model.addAttribute("service", messageService);
 
         return "index";
+    }
+
+    @RequestMapping("/post/{id}")
+    public String post(Model model, @PathVariable final Integer id) {
+
+        Message message = messageService.getById(id);
+        List<Message> comments = messageService.getAllByParent(id);
+
+        model.addAttribute("message", message);
+        model.addAttribute("comments", comments);
+        model.addAttribute("service", messageService);
+
+        return "post";
+    }
+
+    @RequestMapping("/post")
+    public String post(Model model) {
+        return "redirect:/posts";
     }
 
 }

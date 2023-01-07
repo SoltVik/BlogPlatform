@@ -20,15 +20,12 @@
                 <h3 class="mb-2" th:utext="${post.title}">...</h3>
                 <div class="meta-wrap">
                     <p class="meta">
-                        <span th:text="${#dates.format(post.dateCreate, 'MMM dd, yyyy HH:mm')}"><i
-                                class="icon-calendar mr-2"></i>...</span>
-                        <span><i class="icon-comment2 mr-2"></i>Comments: <i
-                                th:utext="${service.countChildByParent(post.id)}">...</i></span>
+                        <span th:text="${#dates.format(post.dateCreate, 'MMM dd, yyyy HH:mm')}"></i>...</span>
+                        <span>Comments: <i th:utext="${service.countChildByParent(post.id)}">...</i></span>
                     </p>
                 </div>
                 <p class="mb-4" th:utext="${#strings.abbreviate(post.text,100)}">...</p>
-                <p><a th:href="@{/post/{id}(id=${post.Id})}" class="btn-custom">Read More <span
-                        class="ion-ios-arrow-forward"></span></a></p>
+                <p><a th:href="@{/post/{id}(id=${post.Id})}" class="btn-custom">Read More</a></p>
             </div>
         </div>
     </div>

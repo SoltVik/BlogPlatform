@@ -1,0 +1,20 @@
+<div class="d-flex flex-start mt-4" th:fragment="comment(title, dateCreate, text)">
+    <div class="flex-grow-1 flex-shrink-1">
+        <div class="media-left">
+            <a href="#"><img class="media-object img-thumbnail" src="https://.../images/avatar.jpg" alt=""></a>
+        </div>
+        <div class="media-body">
+            <div class="media-heading">
+                <div class="d-flex justify-content-between align-items-center">
+                    <p class="mb-1">
+                        Simona Disa <span class="small"
+                                          th:text="${#dates.format(dateCreate, 'MMM dd, yyyy HH:mm')}"></span>
+                    </p>
+                    <a href="#!"><i class="fas fa-reply fa-xs"></i><span class="small"> reply</span></a>
+                </div>
+            </div>
+            <div class="media-text text-justify" th:text="${text}" style="min-width: 300px;"></div>
+            <hr>
+        </div>
+    </div>
+</div>
