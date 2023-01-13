@@ -1,12 +1,13 @@
 package platform.domain;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -39,20 +40,21 @@ public class Message implements Comparable<Message>{
     @Column(name = "date_delete")
     private Date dateDelete;
 
-    @Column(name = "author_id")
-    private int authorId;
-
     @Column(name = "editor_id")
     private int editorId;
 
     @Column(name = "parent_id")
     private int parentId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", updatable = false, insertable = false)
+    private User authorId;
+
     public Message() {
 
     }
 
-    public Message(String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, int authorId, int editorId, int parentId) {
+    public Message(String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, int editorId, int parentId) {
         this.text = text;
         this.title = title;
         this.dateCreate = dateCreate;
@@ -63,7 +65,7 @@ public class Message implements Comparable<Message>{
         this.parentId = parentId;
     }
 
-    public Message(String text, String title, Date dateCreate, int authorId, int parentId) {
+    public Message(String text, String title, Date dateCreate, User authorId, int parentId) {
         this.id = id;
         this.text = text;
         this.title = title;
@@ -120,11 +122,11 @@ public class Message implements Comparable<Message>{
         this.dateDelete = dateDelete;
     }
 
-    public int getAuthorId() {
+    public User getAuthorId() {
         return authorId;
     }
 
-    public void setAuthorId(int authorId) {
+    public void setAuthorId(User authorId) {
         this.authorId = authorId;
     }
 
@@ -143,7 +145,6 @@ public class Message implements Comparable<Message>{
     public void setParentId(int parentId) {
         this.parentId = parentId;
     }
-
 
 
     @Override

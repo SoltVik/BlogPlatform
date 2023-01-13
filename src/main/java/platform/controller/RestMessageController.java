@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import platform.controller.vo.MessageVO;
 import platform.domain.Message;
+import platform.domain.User;
 import platform.service.MessageService;
 
 import java.util.Date;
@@ -25,11 +26,11 @@ public class RestMessageController implements MessageRestApi{
         String text = body.getText();
         String title = body.getTitle();
         Date dateCreate = body.getDateCreate();
-        int authorId = body.getAuthorId();
+        User authorId = body.getAuthorId();
         int parentId = body.getParentId();
 
         Message newMessage = null;
-        if (!StringUtil.isEmpty(text) && !StringUtil.isEmpty(title) && authorId > 0) {
+        if (!StringUtil.isEmpty(text) && !StringUtil.isEmpty(title) && authorId != null) {
             newMessage = new Message(text, title, dateCreate, authorId, parentId);
             messageService.add(newMessage);
         }

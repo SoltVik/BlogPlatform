@@ -1,6 +1,8 @@
 package platform.controller.vo;
 
 import platform.domain.Message;
+import platform.domain.User;
+
 import java.util.Date;
 
 public class MessageVO {
@@ -11,11 +13,11 @@ public class MessageVO {
     private Date dateCreate;
     private Date dateEdit;
     private Date dateDelete;
-    private int authorId;
+    private User authorId;
     private int editorId;
     private int parentId;
 
-    public MessageVO(int id, String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, int authorId, int editorId, int parentId) {
+    public MessageVO(int id, String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, int editorId, int parentId) {
         this.id = id;
         this.text = text;
         this.title = title;
@@ -51,7 +53,7 @@ public class MessageVO {
         return dateDelete;
     }
 
-    public int getAuthorId() {
+    public User getAuthorId() {
         return authorId;
     }
 
