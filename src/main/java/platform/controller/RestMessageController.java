@@ -27,7 +27,7 @@ public class RestMessageController implements MessageRestApi{
         String title = body.getTitle();
         Date dateCreate = body.getDateCreate();
         User authorId = body.getAuthorId();
-        int parentId = body.getParentId();
+        Integer parentId = body.getParentId();
 
         Message newMessage = null;
         if (!StringUtil.isEmpty(text) && !StringUtil.isEmpty(title) && authorId != null) {

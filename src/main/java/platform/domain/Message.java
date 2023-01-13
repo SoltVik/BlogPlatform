@@ -41,20 +41,20 @@ public class Message implements Comparable<Message>{
     private Date dateDelete;
 
     @Column(name = "editor_id")
-    private int editorId;
+    private Integer editorId;
 
     @Column(name = "parent_id")
-    private int parentId;
+    private Integer parentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", updatable = false, insertable = false)
+    @JoinColumn(name = "author_id", updatable = false, insertable = false)
     private User authorId;
 
     public Message() {
 
     }
 
-    public Message(String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, int editorId, int parentId) {
+    public Message(String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, Integer editorId, Integer parentId) {
         this.text = text;
         this.title = title;
         this.dateCreate = dateCreate;
@@ -65,7 +65,7 @@ public class Message implements Comparable<Message>{
         this.parentId = parentId;
     }
 
-    public Message(String text, String title, Date dateCreate, User authorId, int parentId) {
+    public Message(String text, String title, Date dateCreate, User authorId, Integer parentId) {
         this.id = id;
         this.text = text;
         this.title = title;
@@ -134,15 +134,15 @@ public class Message implements Comparable<Message>{
         return editorId;
     }
 
-    public void setEditorId(int editorId) {
+    public void setEditorId(Integer editorId) {
         this.editorId = editorId;
     }
 
-    public int getParentId() {
+    public Integer getParentId() {
         return parentId;
     }
 
-    public void setParentId(int parentId) {
+    public void setParentId(Integer parentId) {
         this.parentId = parentId;
     }
 

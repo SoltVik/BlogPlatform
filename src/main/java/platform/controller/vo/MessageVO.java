@@ -14,10 +14,10 @@ public class MessageVO {
     private Date dateEdit;
     private Date dateDelete;
     private User authorId;
-    private int editorId;
-    private int parentId;
+    private Integer editorId;
+    private Integer parentId;
 
-    public MessageVO(int id, String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, int editorId, int parentId) {
+    public MessageVO(int id, String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, Integer editorId, Integer parentId) {
         this.id = id;
         this.text = text;
         this.title = title;
@@ -57,11 +57,11 @@ public class MessageVO {
         return authorId;
     }
 
-    public int getEditorId() {
+    public Integer getEditorId() {
         return editorId;
     }
 
-    public int getParentId() {
+    public Integer getParentId() {
         return parentId;
     }
 
