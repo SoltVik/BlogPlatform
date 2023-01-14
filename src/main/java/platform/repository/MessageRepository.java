@@ -17,6 +17,6 @@ public interface MessageRepository extends CrudRepository<Message, Integer> {
 
     Iterable <Message> findAll(Sort sort);
 
-    @Query("select m from Message m WHERE m.parentId = 0")
+    @Query("SELECT m FROM Message m WHERE m.parentId = null")
     Page<Message> findAll(Pageable pageable);
 }

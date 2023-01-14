@@ -30,25 +30,35 @@ public class MessageService {
         messageRepository.save(message);
     }
 
-    public Message getById(int idx) {
+    public Message getById(Integer idx) {
         Optional<Message> result = messageRepository.findById(idx);
         return result.orElse(null);
     }
 
-    public List<Message> getAllByParent(int id) {
+    public List<Message> getAllByParent(Integer id) {
         List<Message> messages = messageRepository.findAll();
+
+        messages = messages.stream()
+                .filter(m -> m.getParentId() != null)
+                .collect(Collectors.toList());
+
         return messages.stream()
-                .filter(m -> m.getParentId() == id)
+                .filter(m -> m.getParentId() == (int)id)
                 .sorted((m1, m2) -> m2.compareTo(m1))
                 .collect(Collectors.toList());
     }
 
-    public long countChildByParent(int id) {
-        List<Message> messages = messageRepository.findAll();
+    public long countChildByParent(Integer id) {
+       List<Message> messages = messageRepository.findAll();
+       messages = messages.stream()
+                .filter(m -> m.getParentId() != null)
+                .collect(Collectors.toList());
+
         return messages.stream()
-                .filter(m -> m.getParentId() == id)
+                .filter(m -> m.getParentId() == (int)id)
                 .count();
     }
+
 
     public Message update(int idx, MessageVO messageVO) {
         Message old = messageRepository.findById(idx).get();
@@ -56,12 +66,12 @@ public class MessageService {
         old.setTitle(messageVO.getTitle());
         old.setDateEdit(new Timestamp(System.currentTimeMillis()));
         old.setEditorId(messageVO.getEditorId());
-        old.setParentId(messageVO.getParentId());
+        old.setParent(messageVO.getParent());
 
         return messageRepository.save(old);
     }
 
-    public boolean remove(int idx) {
+    public boolean remove(Integer idx) {
         Message message = getById(idx);
         if (message != null) {
             messageRepository.delete(message);

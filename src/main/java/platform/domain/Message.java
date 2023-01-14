@@ -40,21 +40,26 @@ public class Message implements Comparable<Message>{
     @Column(name = "date_delete")
     private Date dateDelete;
 
-    @Column(name = "editor_id")
-    private Integer editorId;
-
-    @Column(name = "parent_id")
-    private Integer parentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User authorId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", updatable = false, insertable = false)
-    private User authorId;
+    @JoinColumn(name = "editor_id")
+    private User editorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Message parent;
+
+    @Column(name = "parent_id", updatable = false, insertable = false)
+    private Integer parentId;
 
     public Message() {
 
     }
 
-    public Message(String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, Integer editorId, Integer parentId) {
+    public Message(String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, User editorId, Integer parentId) {
         this.text = text;
         this.title = title;
         this.dateCreate = dateCreate;
@@ -130,11 +135,11 @@ public class Message implements Comparable<Message>{
         this.authorId = authorId;
     }
 
-    public int getEditorId() {
+    public User getEditorId() {
         return editorId;
     }
 
-    public void setEditorId(Integer editorId) {
+    public void setEditorId(User editorId) {
         this.editorId = editorId;
     }
 
@@ -142,9 +147,15 @@ public class Message implements Comparable<Message>{
         return parentId;
     }
 
-    public void setParentId(Integer parentId) {
-        this.parentId = parentId;
+    public Message getParent() {
+        return parent;
     }
+
+    public void setParent(Message parent) {
+        this.parent = parent;
+        this.parentId = (parent != null) ? parent.getParentId() : null;
+    }
+
 
 
     @Override
