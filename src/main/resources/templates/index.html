@@ -21,43 +21,17 @@
                 <div class="meta-wrap">
                     <p class="meta">
                         <span th:text="${#dates.format(post.dateCreate, 'MMM dd, yyyy HH:mm')}"></i>...</span>
-                        <span>Comments: <i th:utext="${service.countChildByParent(post.id)}">...</i></span>
+                        <span>Comments: [[${service.countChildByParent(post.id)}]] [[${post.id}]]</span>
                     </p>
                 </div>
-                <p class="mb-4" th:utext="${#strings.abbreviate(post.text,100)}">...</p>
+                <p class="mb-4" th:utext="${#strings.abbreviate(post.text,500)}">...</p>
                 <p><a th:href="@{/post/{id}(id=${post.Id})}" class="btn-custom">Read More</a></p>
             </div>
         </div>
     </div>
 
-    <nav aria-label="Pagination" th:if="${totalPages > 0}">
-        <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link" title='First Page' th:href="@{/posts(page=1)}"> << </a>
-            </li>
-            <li class="page-item font-weight-bold" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link" title='Previous Page' th:href="@{/posts(page=${currentPage - 1})}">Prev</a>
-            </li>
-            <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
-                <a class="page-link" href="#">...</a>
-            </li>
-            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
-                th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
-                <a class="page-link" th:title="'Page ' + ${page}" th:href="@{/posts(page=${page})}">[[${page}]]</a>
-            </li>
-            <li class="page-item disabled" th:if="${currentPage + 2 < totalPages}">
-                <a class="page-link" href="#">...</a>
-            </li>
-            <li class="page-item font-weight-bold" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link" title='Next Page' th:href="@{/posts(page=${currentPage + 1})}">Next</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link" title='Last Page' th:href="@{/posts(page=${totalPages})}"> >> </a>
-            </li>
-        </ul>
-    </nav>
+    <nav th:replace="fragments/pagination :: pagination(${currentPage}, ${page}, ${totalPages})"/></nav>
 </div>
-
 
 </body>
 </html>
