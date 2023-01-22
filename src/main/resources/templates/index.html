@@ -4,15 +4,12 @@
     <title>Blog Platform</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css?v=1}"/>
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-
 </head>
 <body>
-
 <div class="container-fluid" style="max-width: 900px; margin: 0 auto;">
     <div class="col-md-12" th:each="post : ${posts.content}">
         <div class="blog-entry  d-md-flex">
@@ -32,6 +29,5 @@
 
     <nav th:replace="fragments/pagination :: pagination(${currentPage}, ${page}, ${totalPages})"/></nav>
 </div>
-
 </body>
 </html>

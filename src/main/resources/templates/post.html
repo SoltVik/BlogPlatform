@@ -3,69 +3,79 @@
 <head>
     <title>Blog Platform - [[${message.title}]]</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css?v=1}"/>
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-
-
-
 </head>
 <body>
-
-<div class="container-fluid" style="max-width: 900px; margin: 0 auto;">
-    <div class="col-md-12">
-        <div class="blog-entry  d-md-flex">
-            <div class="text text-2 pl-md-4">
-                <h3 class="mb-2" th:utext="${message.title}">...</h3>
-                <div class="meta-wrap">
-                    <p class="meta">
-                        <span th:text="${#dates.format(message.dateCreate, 'MMM dd, yyyy HH:mm')}"></i>...</span>
-                        <span>Comments: <i th:utext="${service.countChildByParent(message.id)}">...</i></span>
-                    </p>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="mb-2" th:utext="${message.title}"></h3>
+            <div class="meta-wrap">
+                <p class="meta">
+                    <span th:text="${#dates.format(message.dateCreate, 'MMM dd, yyyy HH:mm')}"></span>
+                    <span>Comments: [[${service.countChildByParent(message.id)}]]</span>
+                    <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${message.id}" class="pull-right"
+                       th:href="'#com' + ${message.id}"><i><small>Reply</small></i></a>
+                </p>
+            </div>
+            <p class="mb-4" th:utext="${message.text}"></p>
+            <div class="modal fade" th:id="'modal-reply-'+${message.id}" tabindex="-1" role="dialog"
+                 th:attr="aria-labelledby=ReplyToPost + ${message.id}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" th:id="ReplyToPost + ${message.id}">Reply to message</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:id="'form-reply-'+${message.id}" th:action="@{/post/reply}" method="POST">
+                                <div class="form-group">
+                                    <label for="commentText" class="col-form-label">Comment:</label>
+                                    <textarea rows="10" class="form-control" name="text" id="commentText"></textarea>
+                                    <input type="hidden" name="postId" th:value="${message.id}">
+                                    <input type="hidden" name="title" th:value="'Re:' + ${message.title}">
+                                    <input type="hidden" name="authorId" th:value="'0'">
+                                    <input type="hidden" name="parentId" th:value="${message.id}">
+                                    <input type="submit" th:id="'submit-form-'+${message.id}" class="hidden"/>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <label type="button" class="btn btn-primary" th:for="'submit-form-'+${message.id}">Reply</label>
+                        </div>
+                    </div>
                 </div>
-                <p class="mb-4" th:utext="${#strings.abbreviate(message.text,100)}">...</p>
-                <p><a th:href="@{/post/{id}(id=${message.Id})}" class="btn-custom">Read More</a></p>
+            </div>
+            <div class="blog-comment">
+                <h3>Comments</h3>
+                <hr/>
+                <div th:if="${mainComments == 0}" class="post-comments">
+                    <p>No comments, be the first...</p>
+                </div>
+                <th:block th:fragment="commentTree(subComments)">
+                    <ul class="comments">
+                        <li class="clearfix" th:each="comment : ${subComments}">
+                            <div th:if="${#lists.isEmpty(service.getAllByParent(comment.id))}">
+                                <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message})"></div>
+                            </div>
+                            <div th:unless="${#lists.isEmpty(service.getAllByParent(comment.id))}">
+                                <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message})"></div>
+                                <div th:include="this::commentTree(${service.getAllByParent(comment.id)})"/>
+                            </div>
+                        </li>
+                    </ul>
+                </th:block>
+                <div th:if="${mainComments > 0}" th:include="this::commentTree(${comments})"/>
             </div>
         </div>
     </div>
-
-
-
-
-
-    <div class="comments">
-    <th:block th:fragment="getCommentTree(subComments)">
-
-            <ul class="media-list">
-                <!-- Комментарий (уровень 1) -->
-                <li class="media" th:each="comment : ${subComments}">
-                    <div th:if="${#lists.isEmpty(service.getAllByParent(comment.id))}">
-                        <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text})"></div>
-                    </div>
-                    <div th:unless="${#lists.isEmpty(service.getAllByParent(comment.id))}">
-                        <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text})"></div>
-                        <div th:include="this::getCommentTree(${service.getAllByParent(comment.id)})"/>
-                    </div>
-                </li>
-            </ul>
-
-    </th:block>
-
-
-    <div th:include="this::getCommentTree(${comments})"/>
-    </div>
-
-
-
-
-
-
-
 </div>
-
-
 </body>
 </html>

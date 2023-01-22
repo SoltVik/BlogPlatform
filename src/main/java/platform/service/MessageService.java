@@ -48,14 +48,14 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
-    public long countChildByParent(Integer id) {
+    public long countChildByParent(int id) {
        List<Message> messages = messageRepository.findAll();
        messages = messages.stream()
                 .filter(m -> m.getParentId() != null)
                 .collect(Collectors.toList());
 
         return messages.stream()
-                .filter(m -> m.getParentId() == (int)id)
+                .filter(m -> m.getParentId() == id)
                 .count();
     }
 
@@ -65,7 +65,7 @@ public class MessageService {
         old.setText(messageVO.getText());
         old.setTitle(messageVO.getTitle());
         old.setDateEdit(new Timestamp(System.currentTimeMillis()));
-        old.setEditorId(messageVO.getEditorId());
+        old.setEditor(messageVO.getEditorId());
         old.setParent(messageVO.getParent());
 
         return messageRepository.save(old);

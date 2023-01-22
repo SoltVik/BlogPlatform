@@ -1,20 +1,39 @@
-<div class="d-flex flex-start mt-4" th:fragment="comment(title, dateCreate, text)">
-    <div class="flex-grow-1 flex-shrink-1">
-        <div class="media-left">
-            <a href="#"><img class="media-object img-thumbnail" src="https://.../images/avatar.jpg" alt=""></a>
-        </div>
-        <div class="media-body">
-            <div class="media-heading">
-                <div class="d-flex justify-content-between align-items-center">
-                    <p class="mb-1">
-                        Simona Disa <span class="small"
-                                          th:text="${#dates.format(dateCreate, 'MMM dd, yyyy HH:mm')}"></span>
-                    </p>
-                    <a href="#!"><i class="fas fa-reply fa-xs"></i><span class="small"> reply</span></a>
+<div th:fragment="comment(title, dateCreate, text, id, message)">
+    <img th:src="@{/img/user_{id}.png(id=${id%5})}" class="avatar" alt="">
+    <div class="post-comments" th:id="com + ${id}">
+        <p class="meta">[[${#dates.format(dateCreate, 'MMM dd, yyyy HH:mm')}]] <a href="#">JohnDoe</a> says :
+            <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${id}" class="pull-right" th:href="'#com' + ${id}"><i><small>Reply</small></i></a>
+        </p>
+        <p th:text="${text}"></p>
+    </div>
+    <div class="modal fade" th:id="'modal-reply-'+${id }" tabindex="-1" role="dialog"
+         th:attr="aria-labelledby=ReplyToComment + ${id}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:id="ReplyToComment + ${id}">Reply to comment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form th:id="'form-reply-'+${id }" th:action="@{/post/reply}" method="POST">
+                        <div class="form-group">
+                            <label for="commentText" class="col-form-label">Comment:</label>
+                            <textarea rows="10" class="form-control" name="text" id="commentText"></textarea>
+                            <input type="hidden" name="postId" th:value="${message.id}">
+                            <input type="hidden" name="title" th:value="'Re:' + ${message.title}">
+                            <input type="hidden" name="authorId" th:value="'0'">
+                            <input type="hidden" name="parentId" th:value="${id}">
+                            <input type="submit" th:id="'submit-form-'+${id}" class="hidden"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <label type="button" class="btn btn-primary" th:for="'submit-form-'+${id}">Reply</label>
                 </div>
             </div>
-            <div class="media-text text-justify" th:text="${text}" style="min-width: 300px;"></div>
-            <hr>
         </div>
     </div>
 </div>
