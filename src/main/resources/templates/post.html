@@ -18,11 +18,34 @@
                 <p class="meta">
                     <span th:text="${#dates.format(message.dateCreate, 'MMM dd, yyyy HH:mm')}"></span>
                     <span>Comments: [[${service.countChildByParent(message.id)}]]</span>
-                    <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${message.id}" class="pull-right"
-                       th:href="'#com' + ${message.id}"><i><small>Reply</small></i></a>
+                    <a data-toggle="modal" th:attr="data-target='#modal-del-'+${message.id}" th:href="'#com' + ${message.id}"><span class="glyphicon glyphicon-trash"></span></a>
+                    <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${message.id}" class="pull-right" th:href="'#com' + ${message.id}"><i><small>Reply</small></i></a>
                 </p>
             </div>
             <p class="mb-4" th:utext="${message.text}"></p>
+            <div class="modal fade in" th:id="'modal-del-'+${message.id}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                            <h5 class="modal-title text-danger">Delete message</h5>
+                        </div>
+                        <div class="modal-body">
+                            <h3>Are you sure want to delete this message and all comments?</h3>
+                            <form th:id="'form-del-'+${message.id}" th:action="@{/post/delete/{id}(id=${message.id})}" th:method="DELETE">
+                                <input type="hidden" name="id" th:value="${message.id}">
+                                <input type="hidden" name="postId" th:value="${message.id}">
+                                <input type="submit" th:id="'submit-form-del-'+${message.id}" class="hidden"/>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
+                            <label type="button" class="btn btn-primary btn-danger" th:for="'submit-form-del-'+${message.id}"><i class="fa fa-check"></i>&nbsp;Yes</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="modal fade" th:id="'modal-reply-'+${message.id}" tabindex="-1" role="dialog"
                  th:attr="aria-labelledby=ReplyToPost + ${message.id}" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -47,7 +70,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
                             <label type="button" class="btn btn-primary" th:for="'submit-form-'+${message.id}">Reply</label>
                         </div>
                     </div>

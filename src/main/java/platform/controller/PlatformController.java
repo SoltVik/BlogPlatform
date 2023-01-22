@@ -26,7 +26,6 @@ public class PlatformController {
 
     @GetMapping({"/", "/posts"})
     public String index(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "3") int size) {
-
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
         Page<Message> messages = messageService.findAll(pageable);
 
@@ -72,11 +71,23 @@ public class PlatformController {
 
     @PostMapping("/post/reply")
     public String reply(int postId, String text, String title, int authorId, int parentId) {
-
         Message parent = messageService.getById(parentId);
         Message message = new Message(text, title, new Date(), userService.findById(authorId), parent);
         messageService.add(message);
 
         return "redirect:/post/" + postId + "#com" + parentId;
+    }
+
+    @DeleteMapping("/post/delete/{id}")
+    public String deleteMessage(int id, int postId) {
+        messageService.deleteAllByParent(id);
+        Message parent = messageService.getById(id).getParent();
+        messageService.remove(id);
+
+        if (parent != null) {
+            return "redirect:/post/" + postId + "#com" + parent.getId();
+        } else {
+            return "redirect:/posts";
+        }
     }
 }

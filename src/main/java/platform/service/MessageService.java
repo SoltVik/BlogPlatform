@@ -1,5 +1,7 @@
 package platform.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class MessageService {
+    static final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Autowired
     private MessageRepository messageRepository;
@@ -35,7 +38,7 @@ public class MessageService {
         return result.orElse(null);
     }
 
-    public List<Message> getAllByParent(Integer id) {
+    public List<Message> getAllByParent(int id) {
         List<Message> messages = messageRepository.findAll();
 
         messages = messages.stream()
@@ -43,7 +46,7 @@ public class MessageService {
                 .collect(Collectors.toList());
 
         return messages.stream()
-                .filter(m -> m.getParentId() == (int)id)
+                .filter(m -> m.getParentId() == id)
                 .sorted((m1, m2) -> m2.compareTo(m1))
                 .collect(Collectors.toList());
     }
@@ -57,6 +60,19 @@ public class MessageService {
         return messages.stream()
                 .filter(m -> m.getParentId() == id)
                 .count();
+    }
+
+    public void deleteAllByParent(int id) {
+        List<Message> messages = getAllByParent(id);
+
+        for ( Message message : messages) {
+            if (getAllByParent(message.getId()).isEmpty()) {
+                remove(message.getId());
+            } else if (!getAllByParent(message.getId()).isEmpty()) {
+                deleteAllByParent(message.getId());
+                remove(message.getId());
+            }
+        }
     }
 
 
@@ -74,6 +90,7 @@ public class MessageService {
     public boolean remove(Integer idx) {
         Message message = getById(idx);
         if (message != null) {
+            logger.info("Removed message {}", message);
             messageRepository.delete(message);
             return true;
         } else {
