@@ -11,6 +11,37 @@
 </head>
 <body>
 <div class="container-fluid" style="max-width: 900px; margin: 0 auto;">
+    <a data-toggle="modal" data-target="#modal-add" class="pull-right" href="#com"><i><small>Add post</small></i></a>
+    <div class="modal fade" id="modal-add" tabindex="-1" role="dialog"
+         aria-labelledby="AddPost" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="AddPost">Add Post</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-add" th:action="@{/post/add}" method="POST">
+                        <div class="form-group">
+                            <label for="messageTitle" class="col-form-label">Title:</label>
+                            <input class="form-control" id="messageTitle" name="title"/>
+                            <label for="messageText" class="col-form-label">Message:</label>
+                            <textarea rows="10" class="form-control" id="messageText" name="text"></textarea>
+
+                            <input type="hidden" name="authorId" th:value="'0'">
+                            <input type="submit" id="submit-form" class="hidden"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
+                    <label class="btn btn-primary" for="submit-form">Add</label>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-md-12" th:each="post : ${posts.content}">
         <div class="blog-entry  d-md-flex">
             <div class="text text-2 pl-md-4">

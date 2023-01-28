@@ -2,8 +2,9 @@
     <img th:src="@{/img/user_{id}.png(id=${id%5})}" class="avatar" alt="">
     <div class="post-comments" th:id="com + ${id}">
         <p class="meta">[[${#dates.format(dateCreate, 'MMM dd, yyyy HH:mm')}]] <a href="#">JohnDoe</a> says :
-            <a data-toggle="modal" th:attr="data-target='#modal-del-'+${id}" th:href="'#com' + ${id}"><span class="glyphicon glyphicon-trash"></span></a>
-            <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${id}" class="pull-right" th:href="'#com' + ${id}"><i><small>Reply</small></i></a>
+            <a data-toggle="modal" th:attr="data-target='#modal-del-'+${id}" th:href="'#com' + ${id}" title="Delete comment"><span class="glyphicon glyphicon-trash"></span></a>
+            <a data-toggle="modal" th:attr="data-target='#modal-edit-'+${id}" th:href="'#com' + ${id}" title="Edit comment"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${id}" class="pull-right" th:href="'#com' + ${id}" title="Reply to comment"><i><small>Reply</small></i></a>
         </p>
         <p th:text="${text}"></p>
     </div>
@@ -17,7 +18,7 @@
                 </div>
                 <div class="modal-body">
                     <h3>Are you sure want to delete this comment and all parent comments?</h3>
-                    <form th:id="'form-del-'+${id }" th:action="@{/post/delete/{id}(id=${id})}" th:method="DELETE">
+                    <form th:id="'form-del-'+${id}" th:action="@{/post/delete/{id}(id=${id})}" th:method="DELETE">
                         <input type="hidden" name="id" th:value="${id}">
                         <input type="hidden" name="postId" th:value="${message.id}">
                         <input type="submit" th:id="'submit-form-del-'+${id}" class="hidden"/>
@@ -30,7 +31,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" th:id="'modal-reply-'+${id }" tabindex="-1" role="dialog" th:attr="aria-labelledby=ReplyToComment + ${id}" aria-hidden="true">
+    <div class="modal fade" th:id="'modal-reply-'+${id}" tabindex="-1" role="dialog" th:attr="aria-labelledby=ReplyToComment + ${id}" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -40,7 +41,7 @@
                     <h5 class="modal-title" th:id="ReplyToComment + ${id}">Reply to comment</h5>
                 </div>
                 <div class="modal-body">
-                    <form th:id="'form-reply-'+${id }" th:action="@{/post/reply}" method="POST">
+                    <form th:id="'form-reply-'+${id}" th:action="@{/post/reply}" method="POST">
                         <div class="form-group">
                             <label for="commentText" class="col-form-label">Comment:</label>
                             <textarea rows="10" class="form-control" name="text" id="commentText"></textarea>
@@ -55,6 +56,33 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
                     <label type="button" class="btn btn-primary" th:for="'submit-form-reply-'+${id}">Reply</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" th:id="'modal-edit-'+${id}" tabindex="-1" role="dialog" th:attr="aria-labelledby=EditComment + ${id}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title" th:id="EditComment + ${id}">Edit comment</h5>
+                </div>
+                <div class="modal-body">
+                    <form th:id="'form-edit-'+${id}" th:action="@{/post/edit}" method="POST">
+                        <div class="form-group">
+                            <label for="editText" class="col-form-label">Comment:</label>
+                            <textarea rows="10" class="form-control" id="editText">[[${text}]]</textarea>
+                            <input type="hidden" name="postId" th:value="${message.id}">
+                            <input type="hidden" name="editorId" th:value="'0'">
+                            <input type="submit" th:id="'submit-form-edit-'+${id}" class="hidden"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
+                    <label type="button" class="btn btn-primary" th:for="'submit-form-edit-'+${id}">Reply</label>
                 </div>
             </div>
         </div>

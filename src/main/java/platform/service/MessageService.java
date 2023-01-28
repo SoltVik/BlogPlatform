@@ -11,6 +11,7 @@ import platform.domain.Message;
 import platform.repository.MessageRepository;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ public class MessageService {
     public List<Message> getAll() {
         return messageRepository.findAll();
     }
+
     public Page<Message> findAll(Pageable pageable) {
         return messageRepository.findAll(pageable);
     }
@@ -34,7 +36,7 @@ public class MessageService {
     }
 
     public Message getById(Integer idx) {
-        Optional<Message> result = messageRepository.findById(idx);
+        Optional<Message> result = messageRepository.findByIdAndDateDeleteIsNull(idx);
         return result.orElse(null);
     }
 
@@ -43,6 +45,7 @@ public class MessageService {
 
         messages = messages.stream()
                 .filter(m -> m.getParentId() != null)
+                .filter(m -> m.getDateDelete() == null)
                 .collect(Collectors.toList());
 
         return messages.stream()
@@ -52,8 +55,8 @@ public class MessageService {
     }
 
     public long countChildByParent(int id) {
-       List<Message> messages = messageRepository.findAll();
-       messages = messages.stream()
+        List<Message> messages = messageRepository.findAll();
+        messages = messages.stream()
                 .filter(m -> m.getParentId() != null)
                 .collect(Collectors.toList());
 
@@ -65,7 +68,7 @@ public class MessageService {
     public void deleteAllByParent(int id) {
         List<Message> messages = getAllByParent(id);
 
-        for ( Message message : messages) {
+        for (Message message : messages) {
             if (getAllByParent(message.getId()).isEmpty()) {
                 remove(message.getId());
             } else if (!getAllByParent(message.getId()).isEmpty()) {
@@ -74,7 +77,6 @@ public class MessageService {
             }
         }
     }
-
 
     public Message update(int idx, MessageVO messageVO) {
         Message old = messageRepository.findById(idx).get();
@@ -91,7 +93,8 @@ public class MessageService {
         Message message = getById(idx);
         if (message != null) {
             logger.info("Removed message {}", message);
-            messageRepository.delete(message);
+            message.setDateDelete(new Date());
+            messageRepository.save(message);
             return true;
         } else {
             return false;
