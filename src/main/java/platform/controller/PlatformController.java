@@ -9,12 +9,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import platform.domain.Message;
+import platform.domain.User;
 import platform.service.MessageService;
 import platform.service.UserService;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class PlatformController {
@@ -29,7 +29,9 @@ public class PlatformController {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
         Page<Message> messages = messageService.findAll(pageable);
 
+        Message message = new Message();
         model.addAttribute("posts", messages);
+        model.addAttribute("message", message);
         model.addAttribute("currentPage", messages.getNumber() + 1);
         model.addAttribute("totalItems", messages.getTotalElements());
         model.addAttribute("totalPages", messages.getTotalPages());
@@ -39,34 +41,50 @@ public class PlatformController {
         return "index";
     }
 
-    @GetMapping({"/post/{action}", "/post/{action}/{id}"})
-    public String post(Model model, @PathVariable String action, @PathVariable Optional<Integer> id) {
-        Message message = new Message();
-        if (action.matches("\\d+")) {
-            int idx = Integer.parseInt(action);
-            if (idx > 0) {
-                message = messageService.getById(idx);
-                List<Message> comments = messageService.getAllByParent(idx);
-                int mainComments = (int) messageService.countChildByParent(idx);
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
 
-                model.addAttribute("message", message);
-                model.addAttribute("comments", comments);
-                model.addAttribute("mainComments", mainComments);
-                model.addAttribute("service", messageService);
-
-                return "post";
-            }
-        } else if (action.equalsIgnoreCase("add") && !id.isPresent()) {
-            model.addAttribute("title", "add");
-            model.addAttribute("message", message);
-            model.addAttribute("title", "Add");
-            return "add";
-        } else if (action.equalsIgnoreCase("reply") && id.isPresent()) {
-            model.addAttribute("message", message);
-            model.addAttribute("title", "Reply");
-            return "add";
-        }
+    @GetMapping("/post")
+        public String viewPost(){
         return "redirect:/posts";
+    }
+
+    @GetMapping("/post/{id}")
+        public String viewPost(Model model,  @PathVariable int id) {
+        Message message = messageService.getById(id);
+        if (message == null) {
+            return "redirect:/posts";
+        }
+        List<Message> comments = messageService.getAllByParent(id);
+        int mainComments = (int) messageService.countChildByParent(id);
+
+        model.addAttribute("message", message);
+        model.addAttribute("comments", comments);
+        model.addAttribute("mainComments", mainComments);
+        model.addAttribute("service", messageService);
+
+        return "post";
+    }
+
+    @PostMapping("/post/add")
+    public String addPost(int authorId, String title, String text) {
+        User author = userService.findById(authorId);
+        if (title != null && text != null && author != null) {
+            Message newMessage = new Message(text, title, new Date(), author, null);
+            messageService.add(newMessage);
+        }
+
+        return "redirect:/posts";
+    }
+
+    @GetMapping("/post/reply/{id}")
+    public String post(Model model, @PathVariable Integer id) {
+        Message message = new Message();
+        model.addAttribute("message", message);
+        model.addAttribute("title", "Reply");
+        return "add";
     }
 
     @PostMapping("/post/reply")
