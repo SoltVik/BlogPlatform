@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
@@ -22,9 +24,12 @@ public class Message implements Comparable<Message>{
     @Column(name = "message_id")
     private int id;
 
+    @Size(min = 10, message= "Text must be minimum 10 characters")
     @Column(name = "text")
     private String text;
 
+    @NotNull(message = "Title cannot be null")
+    @Size(min = 10, max = 200, message= "Title must be between 10 and 200 characters")
     @Column(name = "title")
     private String title;
 
@@ -42,11 +47,11 @@ public class Message implements Comparable<Message>{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private User authorId;
+    private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "editor_id")
-    private User editorId;
+    private User editor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -59,24 +64,23 @@ public class Message implements Comparable<Message>{
 
     }
 
-    public Message(String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, User editorId, Integer parentId) {
+    public Message(String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User author, User editorId, Message parent) {
         this.text = text;
         this.title = title;
         this.dateCreate = dateCreate;
         this.dateEdit = dateEdit;
         this.dateDelete = dateDelete;
-        this.authorId = authorId;
-        this.editorId = editorId;
-        this.parentId = parentId;
+        this.author = author;
+        this.editor = editorId;
+        this.parent = parent;
     }
 
-    public Message(String text, String title, Date dateCreate, User authorId, Integer parentId) {
-        this.id = id;
+    public Message(String text, String title, Date dateCreate, User author, Message parent) {
         this.text = text;
         this.title = title;
         this.dateCreate = dateCreate;
-        this.authorId = authorId;
-        this.parentId = parentId;
+        this.author = author;
+        this.parent = parent;
     }
 
     public int getId() {
@@ -127,20 +131,20 @@ public class Message implements Comparable<Message>{
         this.dateDelete = dateDelete;
     }
 
-    public User getAuthorId() {
-        return authorId;
+    public User getAuthor() {
+        return author;
     }
 
-    public void setAuthorId(User authorId) {
-        this.authorId = authorId;
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
-    public User getEditorId() {
-        return editorId;
+    public User getEditor() {
+        return editor;
     }
 
-    public void setEditorId(User editorId) {
-        this.editorId = editorId;
+    public void setEditor(User editor) {
+        this.editor = editor;
     }
 
     public Integer getParentId() {
@@ -156,8 +160,6 @@ public class Message implements Comparable<Message>{
         this.parentId = (parent != null) ? parent.getParentId() : null;
     }
 
-
-
     @Override
     public String toString() {
         return "Message{" +
@@ -167,8 +169,8 @@ public class Message implements Comparable<Message>{
                 ", dateCreate=" + dateCreate +
                 ", dateEdit=" + dateEdit +
                 ", dateDelete=" + dateDelete +
-                ", authorId=" + authorId +
-                ", editorId=" + editorId +
+                ", author=" + author +
+                ", editor=" + editor +
                 ", parentId=" + parentId +
                 '}';
     }

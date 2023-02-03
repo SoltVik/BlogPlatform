@@ -1,6 +1,10 @@
 package platform.domain;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="users")
@@ -11,27 +15,36 @@ public class User {
     @Column(name = "user_id")
     private int id;
 
-    @Column(name = "name")
-    private String name;
+    @NotEmpty
+    @Size(min = 3, max = 20, message = "Username must be between 10 and 20 characters")
+    @Column(name = "username")
+    private String username;
 
+    @NotNull(message = "Password cannot be null")
     @Column(name = "password")
     private String password;
 
+    @Email(message = "Email should be valid")
     @Column(name = "email")
     private String email;
 
-    @Column(name = "is_admin")
-    private boolean isAdmin;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role")
+    Role role;
+
+    @Column(name = "enabled")
+    private int enabled;
 
     public User() {
 
     }
 
-    public User(String name, String password, String email, boolean isAdmin) {
-        this.name = name;
+    public User(String username, String password, String email, Role role, int enabled) {
+        this.username = username;
         this.password = password;
         this.email = email;
-        this.isAdmin = isAdmin;
+        this.role = role;
+        this.enabled = enabled;
     }
 
     public int getId() {
@@ -42,12 +55,12 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -66,22 +79,31 @@ public class User {
         this.email = email;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
+    public Role getRole() {
+        return role;
     }
 
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public int getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(int enabled) {
+        this.enabled = enabled;
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
-                ", isAdmin=" + isAdmin +
+                ", role=" + role +
+                ", enabled=" + enabled +
                 '}';
     }
 }
