@@ -4,6 +4,9 @@
 body {
   background: url(../img/background.png);
   overflow-y: scroll;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 .section {
   padding: 30px 0;
@@ -479,13 +482,11 @@ a:hover {
   color: #A0A0A0;
   padding: 0 20px 10px 20px;
   border-top: 4px solid #4f8db3;
-  margin-top: 20px;
+  margin-top: auto;
   -webkit-box-shadow: 0 -1px 12px rgba(0,0,0,0.4);
   -moz-box-shadow: 0 -1px 12px rgba(0,0,0,0.4);
   box-shadow: 0 -1px 12px rgba(0,0,0,0.4);
   color: 0 -1px 12px rgba(0,0,0,0.4);
-  bottom: 0;
-  position: fixed;
   width: 100%;
 }
 

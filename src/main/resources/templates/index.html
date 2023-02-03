@@ -1,64 +1,137 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <title>Blog Platform</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css?v=1}"/>
-    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
-    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,600,800' rel='stylesheet' type='text/css'>
 </head>
 <body>
-<div class="container-fluid" style="max-width: 900px; margin: 0 auto;">
-    <a data-toggle="modal" data-target="#modal-add" class="pull-right" href="#com"><i><small>Add post</small></i></a>
-    <div class="modal fade" id="modal-add" tabindex="-1" role="dialog"
-         aria-labelledby="AddPost" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="AddPost">Add Post</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="form-add" th:action="@{/post/add}" method="POST">
-                        <div class="form-group">
-                            <label for="messageTitle" class="col-form-label">Title:</label>
-                            <input class="form-control" id="messageTitle" name="title"/>
-                            <label for="messageText" class="col-form-label">Message:</label>
-                            <textarea rows="10" class="form-control" id="messageText" name="text"></textarea>
 
-                            <input type="hidden" name="authorId" th:value="'0'">
-                            <input type="submit" id="submit-form" class="hidden"/>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
-                    <label class="btn btn-primary" for="submit-form">Add</label>
-                </div>
-            </div>
-        </div>
+<!-- Navigation & Logo-->
+<div class="mainmenu-wrapper">
+    <div class="container">
+        <nav id="mainmenu" class="mainmenu">
+            <ul>
+                <li class="logo-wrapper"><a href="/"><img src="/img/logo.png" alt="Blog Platform"></a></li>
+                <li class="active">
+                    <a href="/">Home</a>
+                </li>
+                <li>
+                    <a href="/posts">Posts</a>
+                </li>
+                <li>
+                    <a href="/users">Users</a>
+                </li>
+                <li sec:authorize="hasRole('ANONYMOUS')">
+                    <a href="/login">Log In</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/logout}">Sign Out [ <span sec:authentication="name"></span> ]</a>
+                    Roles: <span sec:authentication="principal.authorities"></span>
+                </li>
+            </ul>
+        </nav>
     </div>
-    <div class="col-md-12" th:each="post : ${posts.content}">
-        <div class="blog-entry  d-md-flex">
-            <div class="text text-2 pl-md-4">
-                <h3 class="mb-2" th:utext="${post.title}">...</h3>
-                <div class="meta-wrap">
-                    <p class="meta">
-                        <span th:text="${#dates.format(post.dateCreate, 'MMM dd, yyyy HH:mm')}"></i>...</span>
-                        <span>Comments: [[${service.countChildByParent(post.id)}]] [[${post.id}]]</span>
-                    </p>
-                </div>
-                <p class="mb-4" th:utext="${#strings.abbreviate(post.text,500)}">...</p>
-                <p><a th:href="@{/post/{id}(id=${post.Id})}" class="btn-custom">Read More</a></p>
-            </div>
-        </div>
-    </div>
-
-    <nav th:replace="fragments/pagination :: pagination(${currentPage}, ${page}, ${totalPages})"/></nav>
 </div>
+<!-- Posts List -->
+<div class="section blog-posts-wrapper">
+    <div class="container">
+        <h2>Last posts</h2>
+        <div class="row">
+            <!-- Post -->
+            <div class="col-md-4 col-sm-6" th:each="post : ${posts}">
+                <div class="blog-post">
+                    <!-- Post Info -->
+                    <div class="post-info">
+                        <div class="post-date">
+                            <div class="date" th:utext="${#dates.format(post.dateCreate, 'dd MMM, yyyy')}"></div>
+                        </div>
+                        <div class="post-comments-count">
+                            <a th:href="'/post/' + ${post.id}" title="Show Comments"><i class="glyphicon glyphicon-comment icon-white"></i>[[${service.countAllChildByParent(post.id)}]]</a>
+                        </div>
+                    </div>
+                    <!-- End Post Info -->
+                    <!-- Post Image -->
+                    <a th:href="'/post/' + ${post.id}"><img th:src="@{/img/blog_{id}.jpg(id=${post.id%10})}" class="post-image" alt="Post Title"></a>
+                    <!-- End Post Image -->
+                    <!-- Post Title & Summary -->
+                    <div class="post-title">
+                        <h3><a th:href="'/post/' + ${post.id}">[[${post.title}]]</a></h3>
+                    </div>
+                    <div class="post-summary">
+                        <p th:utext="${#strings.abbreviate(post.text,200)}"></p>
+                    </div>
+                    <!-- End Post Title & Summary -->
+                    <div class="post-more">
+                        <a th:href="'/post/' + ${post.id}" class="btn btn-small">Read more</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Press Coverage -->
+<div class="section">
+    <div class="container">
+        <h2>Last comments</h2>
+        <div class="row">
+            <div class="col-md-4 col-sm-6" th:each="comment : ${comments}">
+                <div class="in-press press-more">
+                    <a th:href="${'/post/' + {service.getPostByComment(comment.parentId)} + '#com' + {comment.id}}" th:utext="${#strings.abbreviate(comment.text,150)}"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Press Coverage -->
+
+<!-- Testimonials -->
+<div class="section">
+    <div class="container">
+        <h2>Top Authors</h2>
+        <div class="row">
+            <!-- Testimonial -->
+            <div class="testimonial col-md-4 col-sm-6" th:each="author, state : ${topAuthors}">
+                <!-- Author Photo -->
+                <div class="author-photo">
+                    <img th:src="@{/img/user_{id}.png(id=${author.id%5})}">
+                </div>
+                <div class="testimonial-bubble">
+                    <blockquote>
+                        <!-- Quote -->
+                        <p class="quote" th:utext="${#strings.abbreviate(randomMessageToTopAuthors.get(state.index).text,150)}"></p>
+                        <!-- Author Info -->
+                        <cite class="author-info">
+                            - [[${author.username}]],<br>Position <b th:text="${state.count}"></b> in authors top
+                        </cite>
+                    </blockquote>
+                    <div class="sprite arrow-speech-bubble"></div>
+                </div>
+            </div>
+            <!-- End Testimonial -->
+        </div>
+    </div>
+</div>
+<!-- End Testimonials -->
+
+<!-- Footer -->
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="footer-copyright">&copy; 2023 Blog Platform. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Javascripts -->
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </body>
 </html>
