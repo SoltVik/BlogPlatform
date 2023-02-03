@@ -1,13 +1,16 @@
-<div th:fragment="comment(title, dateCreate, text, id, message)">
-    <img th:src="@{/img/user_{id}.png(id=${id%5})}" class="avatar" alt="">
-    <div class="post-comments" th:id="com + ${id}">
-        <p class="meta">[[${#dates.format(dateCreate, 'MMM dd, yyyy HH:mm')}]] <a href="#">JohnDoe</a> says :
+<div th:fragment="comment(title, dateCreate, text, id, message, user)">
+    <div class="comment-wrapper" th:id="com + ${id}">
+        <div class="comment-author"><img th:src="@{/img/user_{id}.png(id=${id%5})}" alt="User Name" th:text="${user.username}"></div>
+            <p th:text="${text}"></p>
+            <!-- Comment Controls -->
+        <div class="comment-actions">
+            <span class="comment-date">[[${#dates.format(dateCreate, 'MMMMM dd, yyyy HH:mm')}]]</span>
             <a data-toggle="modal" th:attr="data-target='#modal-del-'+${id}" th:href="'#com' + ${id}" title="Delete comment"><span class="glyphicon glyphicon-trash"></span></a>
             <a data-toggle="modal" th:attr="data-target='#modal-edit-'+${id}" th:href="'#com' + ${id}" title="Edit comment"><span class="glyphicon glyphicon-pencil"></span></a>
-            <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${id}" class="pull-right" th:href="'#com' + ${id}" title="Reply to comment"><i><small>Reply</small></i></a>
-        </p>
-        <p th:text="${text}"></p>
+            <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${id}" th:href="'#com' + ${id}" class="btn btn-micro btn-grey comment-reply-btn"><i class="glyphicon glyphicon-share-alt"></i> Reply</a>
+        </div>
     </div>
+
     <div class="modal fade in" th:id="'modal-del-'+${id}">
         <div class="modal-dialog">
             <div class="modal-content">

@@ -1,30 +1,30 @@
-<nav aria-label="Pagination" th:if="${totalPages > 0}" th:fragment="pagination(currentPage, page, totalPages)">
-    <ul class="pagination justify-content-center">
-        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-            <a th:if="${currentPage == 1}" class="page-link" title="Previous Page"> &#60;&#60; </a>
-            <a th:unless="${currentPage == 1}" class="page-link" title='Previous Page' th:href="@{/posts(page=${currentPage - 1})}"> &#60;&#60; </a>
+<div class="pagination-wrapper" th:if="${totalPages > 0}" th:fragment="pagination(currentPage, page, totalPages)">
+    <ul class="pagination pagination-lg">
+        <li  th:classappend="${currentPage == 1} ? 'disabled'">
+            <a th:if="${currentPage == 1}"  title="First Page"> &#60;&#60; </a>
+            <a th:unless="${currentPage == 1}" title='First Page' th:href="@{/posts(page=1)}"> &#60;&#60; </a>
         </li>
-        <li class="page-item font-weight-bold" th:classappend="${currentPage == 1} ? 'disabled'">
-            <a th:if="${currentPage == 1}" class="page-link" title='Previous Page'>Prev</a>
-            <a th:unless="${currentPage == 1}" class="page-link" title='Previous Page' th:href="@{/posts(page=${currentPage - 1})}">Prev</a>
+        <li  th:classappend="${currentPage == 1} ? 'disabled'">
+            <a th:if="${currentPage == 1}"  title='Previous Page'>Prev</a>
+            <a th:unless="${currentPage == 1}"  title='Previous Page' th:href="@{/posts(page=${currentPage - 1})}">Prev</a>
         </li>
-        <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
-            <a class="page-link" href="#">...</a>
+        <li class="disabled" th:if="${currentPage - 2 > 1}">
+            <a href="#">...</a>
         </li>
-        <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+        <li th:classappend="${page == currentPage} ? 'active'"
             th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
-            <a class="page-link" th:title="'Page ' + ${page}" th:href="@{/posts(page=${page})}">[[${page}]]</a>
+            <a th:title="'Page ' + ${page}" th:href="@{/posts(page=${page})}">[[${page}]]</a>
         </li>
-        <li class="page-item disabled" th:if="${currentPage + 2 < totalPages}">
-            <a class="page-link" href="#">...</a>
+        <li class="disabled" th:if="${currentPage + 2 < totalPages}">
+            <a href="#">...</a>
         </li>
-        <li class="page-item font-weight-bold" th:classappend="${currentPage == totalPages} ? 'disabled'">
-            <a th:if="${currentPage == totalPages}" class="page-link" title='Next Page'>Next</a>
-            <a th:unless="${currentPage == totalPages}" class="page-link" title='Next Page' th:href="@{/posts(page=${currentPage + 1})}">Next</a>
+        <li class="" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a th:if="${currentPage == totalPages}" title='Next Page'>Next</a>
+            <a th:unless="${currentPage == totalPages}" title='Next Page' th:href="@{/posts(page=${currentPage + 1})}">Next</a>
         </li>
-        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-            <a th:if="${currentPage == totalPages}" class="page-link" title='Last Page'> &#62;&#62; </a>
-            <a th:unless="${currentPage == totalPages}" class="page-link" title='Last Page' th:href="@{/posts(page=${totalPages})}"> &#62;&#62; </a>
+        <li th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a th:if="${currentPage == totalPages}" title='Last Page'> &#62;&#62; </a>
+            <a th:unless="${currentPage == totalPages}" title='Last Page' th:href="@{/posts(page=${totalPages})}"> &#62;&#62; </a>
         </li>
     </ul>
-</nav>
+</div>

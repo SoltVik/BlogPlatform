@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <title>Blog Platform - Register</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css?v=1}"/>
+    <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,600,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+<!-- Navigation & Logo-->
+<div class="mainmenu-wrapper">
+    <div class="container">
+        <nav id="mainmenu" class="mainmenu">
+            <ul>
+                <li class="logo-wrapper"><a href="/"><img src="/img/logo.png" alt="Blog Platform"></a></li>
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li>
+                    <a href="/posts">Posts</a>
+                </li>
+                <li>
+                    <a href="/users">Users</a>
+                </li>
+                <li sec:authorize="hasRole('ANONYMOUS')">
+                    <a href="/login">Log In</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/logout}">Sign Out [ <span sec:authentication="name"></span> ]</a>
+                    Roles: <span sec:authentication="principal.authorities"></span>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Page Title -->
+<div class="section section-breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Register</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <div class="basic-login">
+                    <form th:action="@{/reg}" role="form" th:object="${user}" method="POST">
+                        <div th:if="${#fields.hasAnyErrors()}">
+                            <div class="alert alert-danger" th:each="err : ${#fields.allErrors()}" th:text="${err}" >
+                                Invalid username or password!
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-username"><i class="icon-user"></i> <b>Username</b></label>
+                            <input class="form-control" id="register-username" type="text" th:field="*{username}" placeholder="Username" required="true" autofocus="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email"><i class="icon-user"></i> <b>E-mail</b></label>
+                            <input class="form-control" id="register-email" type="text" th:field="*{email}" placeholder="E-mail" required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password"><i class="icon-lock"></i> <b>Password</b></label>
+                            <input class="form-control" id="register-password" type="password" th:field="*{password}" placeholder="Password" required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password2"><i class="icon-lock"></i> <b>Re-enter Password</b></label>
+                            <input class="form-control" id="register-password2" type="password" name="rePassword" placeholder="Re-enter Password" required="true">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn pull-right">Register</button>
+                            <div class="clearfix"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="footer-copyright">&copy; 2023 Blog Platform. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Javascripts -->
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</body>
+</html>
