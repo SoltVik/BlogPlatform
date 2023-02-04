@@ -71,6 +71,6 @@ public class MessageVO {
     }
 
     public static MessageVO valueOf(Message message) {
-        return new MessageVO(message.getId(), message.getText(), message.getTitle(), message.getDateCreate(), message.getDateEdit(), message.getDateDelete(), message.getAuthorId(), message.getEditorId(), message.getParentId());
+        return new MessageVO(message.getId(), message.getText(), message.getTitle(), message.getDateCreate(), message.getDateEdit(), message.getDateDelete(), message.getAuthor(), message.getEditor(), message.getParentId());
     }
 }

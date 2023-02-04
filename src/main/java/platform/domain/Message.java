@@ -29,7 +29,7 @@ public class Message implements Comparable<Message>{
     private String text;
 
     @NotNull(message = "Title cannot be null")
-    @Size(min = 10, max = 200, message= "Title must be between 10 and 200 characters")
+    @Size(min = 5, max = 200, message= "Title must be between 5 and 200 characters")
     @Column(name = "title")
     private String title;
 

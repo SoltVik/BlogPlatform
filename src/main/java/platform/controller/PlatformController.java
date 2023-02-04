@@ -22,7 +22,6 @@ import platform.service.UserService;
 import java.util.Date;
 import java.util.List;
 
-
 @Controller
 public class PlatformController {
 
@@ -69,19 +68,19 @@ public class PlatformController {
 
     @GetMapping("/login")
     public String login(@CurrentSecurityContext SecurityContext context) {
-         if (context.getAuthentication().getName().equalsIgnoreCase("anonymousUser")) {
+        if (context.getAuthentication().getName().equalsIgnoreCase("anonymousUser")) {
             return "login";
         }
         return "redirect:/";
     }
 
     @GetMapping("/post")
-        public String viewPost(){
+    public String viewPost() {
         return "redirect:/posts";
     }
 
     @GetMapping("/post/{id}")
-        public String viewPost(Model model,  @PathVariable int id) {
+    public String viewPost(Model model, @PathVariable int id) {
         Message message = messageService.getById(id);
         if (message == null || message.getParentId() != null) {
             return "redirect:/posts";
@@ -119,12 +118,33 @@ public class PlatformController {
     }
 
     @PostMapping("/post/reply")
-    public String reply(int postId, String text, String title, int authorId, int parentId) {
+    public String reply(int postId, String text, String title, String authorName, int parentId) {
         Message parent = messageService.getById(parentId);
-        Message message = new Message(text, title, new Date(), userService.findById(authorId), parent);
-        messageService.add(message);
+        User author = userService.findByUsername(authorName);
+
+        if (author != null) {
+            Message message = new Message(text, title, new Date(), author, parent);
+            messageService.add(message);
+        }
 
         return "redirect:/post/" + postId + "#com" + parentId;
+    }
+
+    @PostMapping("/post/edit")
+    public String edit(int postId, int msgId, String editText, String editTitle, String editorName) {
+        Message message = messageService.getById(msgId);
+        User editor = userService.findByUsername(editorName);
+
+        if (editor != null) {
+            message.setTitle(editTitle);
+            message.setText(editText);
+            message.setDateEdit(new Date());
+            message.setEditor(editor);
+            messageService.save(message);
+        }
+
+        return "redirect:/post/" + postId + "#com" + msgId;
+
     }
 
     @DeleteMapping("/post/delete/{id}")
@@ -141,25 +161,25 @@ public class PlatformController {
     }
 
     @GetMapping("/reg")
-    public String regPage(Model model){
+    public String regPage(Model model) {
         User user = new User();
         model.addAttribute("user", user);
         return "reg";
     }
 
     @PostMapping("/reg")
-    public String createUser(Model model, @ModelAttribute("user") User user, BindingResult result, String rePassword){
+    public String createUser(Model model, @ModelAttribute("user") User user, BindingResult result, String rePassword) {
         if (!user.getPassword().equals(rePassword)) {
-            result.rejectValue("pswd", "1","Password mismatch");
+            result.rejectValue("pswd", "1", "Password mismatch");
         }
         if (user.getPassword().isEmpty()) {
-            result.rejectValue("pswd_empty", "2","Password is empty");
+            result.rejectValue("pswd_empty", "2", "Password is empty");
         }
         if (userService.findByUsername(user.getUsername()) != null) {
-            result.rejectValue("username", "3","There is already an account registered with the same username");
+            result.rejectValue("username", "3", "There is already an account registered with the same username");
         }
         if (userService.findByEmail(user.getEmail()) != null) {
-            result.rejectValue("username", "4","There is already an account registered with the same email");
+            result.rejectValue("username", "4", "There is already an account registered with the same email");
         }
         if (!result.hasErrors()) {
             String username = user.getUsername();

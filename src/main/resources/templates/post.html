@@ -16,10 +16,10 @@
             <div class="modal-header bg-danger">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span></button>
-                <h5 class="modal-title text-danger">Delete comment</h5>
+                <h5 class="modal-title text-danger">Delete post</h5>
             </div>
             <div class="modal-body">
-                <h3>Are you sure want to delete this comment and all parent comments?</h3>
+                <h3>Are you sure want to delete this post and all comments?</h3>
                 <form th:id="'form-del-'+${message.id}" th:action="@{/post/delete/{id}(id=${message.id})}"
                       th:method="DELETE">
                     <input type="hidden" name="id" th:value="${message.id}">
@@ -43,15 +43,18 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h5 class="modal-title" th:id="EditComment + ${message.id}">Edit comment</h5>
+                <h5 class="modal-title" th:id="EditComment + ${message.id}">Edit post</h5>
             </div>
             <div class="modal-body">
                 <form th:id="'form-edit-'+${message.id}" th:action="@{/post/edit}" method="POST">
                     <div class="form-group">
+                        <label for="editTitle" class="col-form-label">Title:</label>
+                        <input id="editTitle" name="editTitle" th:value="${message.title}">
                         <label for="editText" class="col-form-label">Comment:</label>
-                        <textarea rows="10" class="form-control" id="editText">[[${message.text}]]</textarea>
+                        <textarea rows="10" class="form-control" id="editText" name="editText">[[${message.text}]]</textarea>
                         <input type="hidden" name="postId" th:value="${message.id}">
-                        <input type="hidden" name="editorId" th:value="'0'">
+                        <input type="hidden" name="msgId" th:value="${message.id}">
+                        <input type="hidden" name="editorName" th:value="${#authentication.name}">
                         <input type="submit" th:id="'submit-form-edit-'+${message.id}" class="hidden"/>
                     </div>
                 </form>
@@ -69,12 +72,12 @@
         <div class="row">
             <div class="blog-post blog-single-post">
                 <div class="single-post-title">
-                    <h3>[[${message.title}]]</h3>
+                    <h3 th:id="com + ${message.id}">[[${message.title}]]</h3>
                 </div>
                 <div class="single-post-info">
                     <i class="glyphicon glyphicon-time"></i>[[${#dates.format(message.dateCreate, 'dd MMM, yyyy')}]] <a href="#comments" title="Show Comments"><i class="glyphicon glyphicon-comment"></i>[[${messageService.countAllChildByParent(message.id)}]]</a>
-                    <a data-toggle="modal" th:attr="data-target='#modal-del-'+${message.id}" th:href="'#com' + ${message.id}" title="Delete comment"><span class="glyphicon glyphicon-trash"></span></a>
-                    <a data-toggle="modal" th:attr="data-target='#modal-edit-'+${message.id}" th:href="'#com' + ${message.id}" title="Edit comment"><span class="glyphicon glyphicon-pencil"></span></a>
+                    <a th:if="${userService.isPermit({message.id}, {message.id}, {#authentication.name})}" data-toggle="modal" th:attr="data-target='#modal-del-'+${message.id}" th:href="'#com' + ${message.id}" title="Delete comment"><span class="glyphicon glyphicon-trash"></span></a>
+                    <a th:if="${userService.isPermit({message.id}, {message.id}, {#authentication.name})}" data-toggle="modal" th:attr="data-target='#modal-edit-'+${message.id}" th:href="'#com' + ${message.id}" title="Edit comment"><span class="glyphicon glyphicon-pencil"></span></a>
                 </div>
                 <div class="single-post-image">
                     <img th:src="@{/img/blog_{id}.jpg(id=${message.id%10})}" alt="Post Title">
@@ -91,10 +94,10 @@
                         <ul class="post-comments">
                             <li th:each="comment : ${subComments}">
                                 <div th:if="${#lists.isEmpty(messageService.getAllByParent(comment.id))}">
-                                    <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message}, ${message.author})"></div>
+                                    <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message}, ${comment.author})"></div>
                                 </div>
                                 <div th:unless="${#lists.isEmpty(messageService.getAllByParent(comment.id))}">
-                                    <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message}, ${message.author})"></div>
+                                    <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message}, ${comment.author})"></div>
                                     <div th:include="this::commentTree(${messageService.getAllByParent(comment.id)})"/>
                                 </div>
                             </li>
@@ -110,7 +113,7 @@
                                 <textarea class="form-control" rows="5" id="comment-message" name="text"></textarea>
                                 <input type="hidden" name="postId" th:value="${message.id}">
                                 <input type="hidden" name="title" th:value="'Re:' + ${message.title}">
-                                <input type="hidden" name="authorId" th:value="'0'">
+                                <input type="hidden" name="authorName" th:value="${#authentication.name}">
                                 <input type="hidden" name="parentId" th:value="${message.id}">
                             </div>
                             <div class="form-group">

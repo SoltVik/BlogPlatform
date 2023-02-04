@@ -5,8 +5,8 @@
             <!-- Comment Controls -->
         <div class="comment-actions">
             <span class="comment-date">[[${#dates.format(dateCreate, 'MMMMM dd, yyyy HH:mm')}]]</span>
-            <a data-toggle="modal" th:attr="data-target='#modal-del-'+${id}" th:href="'#com' + ${id}" title="Delete comment"><span class="glyphicon glyphicon-trash"></span></a>
-            <a data-toggle="modal" th:attr="data-target='#modal-edit-'+${id}" th:href="'#com' + ${id}" title="Edit comment"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a th:if="${userService.isPermit({message.id}, {id}, {#authentication.name})}" data-toggle="modal" th:attr="data-target='#modal-del-'+${id}" th:href="'#com' + ${id}" title="Delete comment"><span class="glyphicon glyphicon-trash"></span></a>
+            <a th:if="${userService.isPermit({message.id}, {id}, {#authentication.name})}" data-toggle="modal" th:attr="data-target='#modal-edit-'+${id}" th:href="'#com' + ${id}" title="Edit comment"><span class="glyphicon glyphicon-pencil"></span></a>
             <a data-toggle="modal" th:attr="data-target='#modal-reply-'+${id}" th:href="'#com' + ${id}" class="btn btn-micro btn-grey comment-reply-btn"><i class="glyphicon glyphicon-share-alt"></i> Reply</a>
         </div>
     </div>
@@ -50,7 +50,7 @@
                             <textarea rows="10" class="form-control" name="text" id="commentText"></textarea>
                             <input type="hidden" name="postId" th:value="${message.id}">
                             <input type="hidden" name="title" th:value="'Re:' + ${message.title}">
-                            <input type="hidden" name="authorId" th:value="'0'">
+                            <input type="hidden" name="authorName" th:value="${#authentication.name}">
                             <input type="hidden" name="parentId" th:value="${id}">
                             <input type="submit" th:id="'submit-form-reply-'+${id}" class="hidden"/>
                         </div>
@@ -76,16 +76,18 @@
                     <form th:id="'form-edit-'+${id}" th:action="@{/post/edit}" method="POST">
                         <div class="form-group">
                             <label for="editText" class="col-form-label">Comment:</label>
-                            <textarea rows="10" class="form-control" id="editText">[[${text}]]</textarea>
+                            <textarea rows="10" class="form-control" id="editText" name="editText">[[${text}]]</textarea>
                             <input type="hidden" name="postId" th:value="${message.id}">
-                            <input type="hidden" name="editorId" th:value="'0'">
+                            <input type="hidden" name="msgId" th:value="${id}">
+                            <input type="hidden" name="editTitle" th:value="${title}">
+                            <input type="hidden" name="editorName" th:value="${#authentication.name}">
                             <input type="submit" th:id="'submit-form-edit-'+${id}" class="hidden"/>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
-                    <label type="button" class="btn btn-primary" th:for="'submit-form-edit-'+${id}">Reply</label>
+                    <label type="button" class="btn btn-primary" th:for="'submit-form-edit-'+${id}">Edit</label>
                 </div>
             </div>
         </div>

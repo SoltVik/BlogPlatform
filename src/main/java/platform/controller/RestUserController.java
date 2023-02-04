@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import platform.controller.vo.UserVO;
+import platform.domain.Role;
 import platform.domain.User;
 import platform.service.UserService;
 
@@ -21,14 +22,15 @@ public class RestUserController implements UserRestApi{
 
     @Override
     public ResponseEntity<UserVO> add(UserVO body) {
-        String name = body.getName();
+        String username = body.getUsername();
         String password = body.getPassword();
         String email = body.getEmail();
-        boolean isAdmin = body.isAdmin();
+        Role role = body.getRole();
+        int enabled = body.getEnabled();
 
         User newUser = null;
-        if (!StringUtil.isEmpty(name) && !StringUtil.isEmpty(password) && !StringUtil.isEmpty(email)) {
-            newUser = new User(name, password, email, isAdmin);
+        if (!StringUtil.isEmpty(username) && !StringUtil.isEmpty(password) && !StringUtil.isEmpty(email) && (role != null) && (enabled >= 0)) {
+            newUser = new User(username, password, email, role, enabled);
             userService.add(newUser);
         }
         return ResponseEntity.ok(UserVO.valueOf(newUser));

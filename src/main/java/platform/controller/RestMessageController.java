@@ -27,11 +27,11 @@ public class RestMessageController implements MessageRestApi{
         String title = body.getTitle();
         Date dateCreate = body.getDateCreate();
         User authorId = body.getAuthorId();
-        Integer parentId = body.getParentId();
+        Message parent = body.getParent();
 
         Message newMessage = null;
         if (!StringUtil.isEmpty(text) && !StringUtil.isEmpty(title) && authorId != null) {
-            newMessage = new Message(text, title, dateCreate, authorId, parentId);
+            newMessage = new Message(text, title, dateCreate, authorId, parent);
             messageService.add(newMessage);
         }
         return ResponseEntity.ok(MessageVO.valueOf(newMessage));

@@ -1,29 +1,32 @@
 package platform.controller.vo;
 
+import platform.domain.Role;
 import platform.domain.User;
 
 public class UserVO {
 
     private int id;
-    private String name;
+    private String username;
     private String password;
     private String email;
-    private boolean isAdmin;
+    private Role role;
+    private int enabled;
 
-    public UserVO(int id, String name, String password, String email, boolean isAdmin) {
+    public UserVO(int id, String username, String password, String email, Role role, int enabled) {
         this.id = id;
-        this.name = name;
+        this.username = username;
         this.password = password;
         this.email = email;
-        this.isAdmin = isAdmin;
+        this.role = role;
+        this.enabled = enabled;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
     public String getPassword() {
@@ -34,11 +37,15 @@ public class UserVO {
         return email;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
+    public Role getRole() {
+        return role;
+    }
+
+    public int getEnabled() {
+        return enabled;
     }
 
     public static UserVO valueOf(User user) {
-        return new UserVO(user.getId(), user.getName(), user.getPassword(), user.getName(), user.isAdmin());
+        return new UserVO(user.getId(), user.getUsername(), user.getPassword(), user.getUsername(), user.getRole(), user.getEnabled());
     }
 }
