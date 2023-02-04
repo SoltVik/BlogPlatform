@@ -1,0 +1,14 @@
+<div class="footer" th:fragment="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="footer-copyright">&copy; [[${#calendars.format(#calendars.createNow(), 'yyyy')}]] Blog Platform. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="javascript">
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</div>

@@ -1,0 +1,25 @@
+<div class="mainmenu-wrapper" th:fragment="navigation(page)">
+    <div class="container">
+        <nav id="mainmenu" class="mainmenu">
+            <ul>
+                <li class="logo-wrapper"><a href="/"><img src="/img/logo.png" alt="Blog Platform"></a></li>
+                <li th:classappend="${page == 'home'} ? 'active'">
+                    <a href="/">Home</a>
+                </li>
+                <li th:classappend="${page == 'posts'} ? 'active'">
+                    <a href="/posts">Posts</a>
+                </li>
+                <li th:classappend="${page == 'users'} ? 'active'">
+                    <a href="/users">Users</a>
+                </li>
+                <li sec:authorize="hasRole('ANONYMOUS')" th:classappend="${page == 'login'} ? 'active'">
+                    <a href="/login">Log In</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/logout}">Sign Out [ <span sec:authentication="name"></span> ]</a>
+                    Roles: <span sec:authentication="principal.authorities"></span>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

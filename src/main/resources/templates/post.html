@@ -1,54 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-<head>
-    <title>Blog Platform - [[${message.title}]]</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css?v=1}"/>
-    <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,600,800' rel='stylesheet' type='text/css'>
-</head>
+<head th:replace="fragments/header :: header(${message.title})"></head>
 <body>
 
 <!-- Navigation & Logo-->
-<div class="mainmenu-wrapper">
-    <div class="container">
-        <nav id="mainmenu" class="mainmenu">
-            <ul>
-                <li class="logo-wrapper"><a href="/"><img src="/img/logo.png" alt="Blog Platform"></a></li>
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li>
-                    <a href="/posts">Posts</a>
-                </li>
-                <li>
-                    <a href="/users">Users</a>
-                </li>
-                <li sec:authorize="hasRole('ANONYMOUS')">
-                    <a href="/login">Log In</a>
-                </li>
-                <li sec:authorize="isAuthenticated()">
-                    <a th:href="@{/logout}">Sign Out [ <span sec:authentication="name"></span> ]</a>
-                    Roles: <span sec:authentication="principal.authorities"></span>
-                </li>
-            </ul>
-        </nav>
-    </div>
+<div th:replace="fragments/navigation :: navigation('post')"/>
 </div>
 
 <!-- Page Title -->
-<div class="section section-breadcrumbs">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Blog Post</h1>
-            </div>
-        </div>
-    </div>
-</div>
+<div th:replace="fragments/header :: pageTitle('Blog Post')"></div>
 
 <div class="modal fade in" th:id="'modal-del-'+${message.id}">
     <div class="modal-dialog">
@@ -60,7 +20,8 @@
             </div>
             <div class="modal-body">
                 <h3>Are you sure want to delete this comment and all parent comments?</h3>
-                <form th:id="'form-del-'+${message.id}" th:action="@{/post/delete/{id}(id=${message.id})}" th:method="DELETE">
+                <form th:id="'form-del-'+${message.id}" th:action="@{/post/delete/{id}(id=${message.id})}"
+                      th:method="DELETE">
                     <input type="hidden" name="id" th:value="${message.id}">
                     <input type="hidden" name="postId" th:value="${message.id}">
                     <input type="submit" th:id="'submit-form-del-'+${message.id}" class="hidden"/>
@@ -68,12 +29,14 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
-                <label type="button" class="btn btn-primary btn-danger" th:for="'submit-form-del-'+${message.id}"><i class="fa fa-check"></i>&nbsp;Yes</label>
+                <label type="button" class="btn btn-primary btn-danger" th:for="'submit-form-del-'+${message.id}"><i
+                        class="fa fa-check"></i>&nbsp;Yes</label>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade" th:id="'modal-edit-'+${message.id}" tabindex="-1" role="dialog" th:attr="aria-labelledby=EditComment + ${message.id}" aria-hidden="true">
+<div class="modal fade" th:id="'modal-edit-'+${message.id}" tabindex="-1" role="dialog"
+     th:attr="aria-labelledby=EditComment + ${message.id}" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -104,84 +67,69 @@
 <div class="section">
     <div class="container">
         <div class="row">
-            <!-- Blog Post -->
-                <div class="blog-post blog-single-post">
-                    <div class="single-post-title">
-                        <h3>[[${message.title}]]</h3>
+            <div class="blog-post blog-single-post">
+                <div class="single-post-title">
+                    <h3>[[${message.title}]]</h3>
+                </div>
+                <div class="single-post-info">
+                    <i class="glyphicon glyphicon-time"></i>[[${#dates.format(message.dateCreate, 'dd MMM, yyyy')}]] <a href="#comments" title="Show Comments"><i class="glyphicon glyphicon-comment"></i>[[${messageService.countAllChildByParent(message.id)}]]</a>
+                    <a data-toggle="modal" th:attr="data-target='#modal-del-'+${message.id}" th:href="'#com' + ${message.id}" title="Delete comment"><span class="glyphicon glyphicon-trash"></span></a>
+                    <a data-toggle="modal" th:attr="data-target='#modal-edit-'+${message.id}" th:href="'#com' + ${message.id}" title="Edit comment"><span class="glyphicon glyphicon-pencil"></span></a>
+                </div>
+                <div class="single-post-image">
+                    <img th:src="@{/img/blog_{id}.jpg(id=${message.id%10})}" alt="Post Title">
+                </div>
+                <div class="single-post-content">
+                    <p th:utext="${message.text}"></p>
+                </div>
+                <div class="post-coments" id="comments">
+                    <h4>Comments ([[${messageService.countAllChildByParent(message.id)}]])</h4>
+                    <div th:if="${mainComments == 0}" class="post-comments">
+                        <p>No comments, be the first...</p>
                     </div>
-                    <div class="single-post-info">
-                        <i class="glyphicon glyphicon-time"></i>[[${#dates.format(message.dateCreate, 'dd MMM, yyyy')}]] <a href="#comments" title="Show Comments"><i class="glyphicon glyphicon-comment"></i>[[${messageService.countAllChildByParent(message.id)}]]</a>
-                        <a data-toggle="modal" th:attr="data-target='#modal-del-'+${message.id}" th:href="'#com' + ${message.id}" title="Delete comment"><span class="glyphicon glyphicon-trash"></span></a>
-                        <a data-toggle="modal" th:attr="data-target='#modal-edit-'+${message.id}" th:href="'#com' + ${message.id}" title="Edit comment"><span class="glyphicon glyphicon-pencil"></span></a>
-                    </div>
-                    <div class="single-post-image">
-                        <img th:src="@{/img/blog_{id}.jpg(id=${message.id%10})}" alt="Post Title">
-                    </div>
-                    <div class="single-post-content">
-                        <p th:utext="${message.text}"></p>
-                    </div>
-                    <!-- Comments -->
-                    <div class="post-coments" id="comments">
-                        <h4>Comments ([[${messageService.countAllChildByParent(message.id)}]])</h4>
-                        <div th:if="${mainComments == 0}" class="post-comments">
-                            <p>No comments, be the first...</p>
-                        </div>
-                        <th:block th:fragment="commentTree(subComments)">
-                            <ul class="post-comments">
-                                <li th:each="comment : ${subComments}">
-                                    <div th:if="${#lists.isEmpty(messageService.getAllByParent(comment.id))}">
-                                        <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message}, ${message.author})"></div>
-                                    </div>
-                                    <div th:unless="${#lists.isEmpty(messageService.getAllByParent(comment.id))}">
-                                        <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message}, ${message.author})"></div>
-                                        <div th:include="this::commentTree(${messageService.getAllByParent(comment.id)})"/>
-                                    </div>
-                                </li>
-                            </ul>
-                        </th:block>
-                        <div th:if="${mainComments > 0}" th:include="this::commentTree(${comments})"/>
-
-                        <!-- Comments Form -->
-                        <h4 class="text-center">Leave a Comment</h4>
-
-                        <div class="comment-form-wrapper">
-                            <form th:action="@{/post/reply}" method="POST">
-                                <div class="form-group">
-                                    <label for="comment-message"><i class="glyphicon glyphicon-comment"></i> <b>Your Message</b></label>
-                                    <textarea class="form-control" rows="5" id="comment-message" name="text"></textarea>
-                                    <input type="hidden" name="postId" th:value="${message.id}">
-                                    <input type="hidden" name="title" th:value="'Re:' + ${message.title}">
-                                    <input type="hidden" name="authorId" th:value="'0'">
-                                    <input type="hidden" name="parentId" th:value="${message.id}">
+                    <th:block th:fragment="commentTree(subComments)">
+                        <ul class="post-comments">
+                            <li th:each="comment : ${subComments}">
+                                <div th:if="${#lists.isEmpty(messageService.getAllByParent(comment.id))}">
+                                    <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message}, ${message.author})"></div>
                                 </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-large pull-right">Send</button>
+                                <div th:unless="${#lists.isEmpty(messageService.getAllByParent(comment.id))}">
+                                    <div th:replace="fragments/comment :: comment(${comment.title}, ${comment.dateCreate}, ${comment.text}, ${comment.id}, ${message}, ${message.author})"></div>
+                                    <div th:include="this::commentTree(${messageService.getAllByParent(comment.id)})"/>
                                 </div>
-                                <div class="clearfix"></div>
-                            </form>
-                        </div>
-                        <!-- End Comment Form -->
+                            </li>
+                        </ul>
+                    </th:block>
+                    <div th:if="${mainComments > 0}" th:include="this::commentTree(${comments})"/>
+                    <h4 class="text-center">Leave a Comment</h4>
+                    <div class="comment-form-wrapper">
+                        <form th:action="@{/post/reply}" method="POST">
+                            <div class="form-group">
+                                <label for="comment-message"><i class="glyphicon glyphicon-comment"></i> <b>Your
+                                    Message</b></label>
+                                <textarea class="form-control" rows="5" id="comment-message" name="text"></textarea>
+                                <input type="hidden" name="postId" th:value="${message.id}">
+                                <input type="hidden" name="title" th:value="'Re:' + ${message.title}">
+                                <input type="hidden" name="authorId" th:value="'0'">
+                                <input type="hidden" name="parentId" th:value="${message.id}">
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-large pull-right">Send</button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </form>
                     </div>
-                    <!-- End Comments -->
+                </div>
             </div>
-            <!-- End Blog Post -->
         </div>
     </div>
 </div>
 
 <!-- Footer -->
-<div class="footer">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="footer-copyright">&copy; 2023 Blog Platform. All rights reserved.</div>
-            </div>
-        </div>
-    </div>
-</div>
+<div th:replace="fragments/footer :: footer"></div>
 
 <!-- Javascripts -->
-<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
-<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+<div th:replace="fragments/footer :: javascript"></div>
+
 </body>
 </html>
