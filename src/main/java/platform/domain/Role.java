@@ -12,6 +12,10 @@ import javax.validation.constraints.NotNull;
 @Table(name="roles")
 public class Role {
 
+    public static final int ROLE_ADMIN = 1;
+    public static final int ROLE_STAFF = 2;
+    public static final int ROLE_USER = 3;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id")

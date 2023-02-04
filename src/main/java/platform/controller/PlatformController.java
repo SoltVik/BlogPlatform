@@ -5,16 +5,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import platform.domain.Message;
+import platform.domain.Role;
 import platform.domain.User;
 import platform.service.MessageService;
+import platform.service.RoleService;
 import platform.service.UserService;
 
 import java.util.Date;
 import java.util.List;
+
 
 @Controller
 public class PlatformController {
@@ -23,9 +30,28 @@ public class PlatformController {
     MessageService messageService;
     @Autowired
     UserService userService;
+    @Autowired
+    RoleService roleService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    @GetMapping({"/", "/posts"})
-    public String index(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "3") int size) {
+    @GetMapping({"/"})
+    public String index(Model model) {
+        List<Message> messages = messageService.getLastPosts(6);
+        List<Message> comments = messageService.getLastComments(6);
+        List<User> topAuthors = userService.getTopAuthors(3);
+        List<Message> randomMessageToTopAuthors = messageService.getRandomPostToUsers(topAuthors);
+
+        model.addAttribute("posts", messages);
+        model.addAttribute("comments", comments);
+        model.addAttribute("service", messageService);
+        model.addAttribute("topAuthors", topAuthors);
+        model.addAttribute("randomMessageToTopAuthors", randomMessageToTopAuthors);
+        return "index";
+    }
+
+    @GetMapping({"/posts"})
+    public String getPosts(Model model, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "6") int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
         Page<Message> messages = messageService.findAll(pageable);
 
@@ -38,12 +64,15 @@ public class PlatformController {
         model.addAttribute("pageSize", size);
         model.addAttribute("service", messageService);
 
-        return "index";
+        return "posts";
     }
 
     @GetMapping("/login")
-    public String login() {
-        return "login";
+    public String login(@CurrentSecurityContext SecurityContext context) {
+         if (context.getAuthentication().getName().equalsIgnoreCase("anonymousUser")) {
+            return "login";
+        }
+        return "redirect:/";
     }
 
     @GetMapping("/post")
@@ -54,7 +83,7 @@ public class PlatformController {
     @GetMapping("/post/{id}")
         public String viewPost(Model model,  @PathVariable int id) {
         Message message = messageService.getById(id);
-        if (message == null) {
+        if (message == null || message.getParentId() != null) {
             return "redirect:/posts";
         }
         List<Message> comments = messageService.getAllByParent(id);
@@ -63,14 +92,16 @@ public class PlatformController {
         model.addAttribute("message", message);
         model.addAttribute("comments", comments);
         model.addAttribute("mainComments", mainComments);
-        model.addAttribute("service", messageService);
+        model.addAttribute("messageService", messageService);
+        model.addAttribute("userService", userService);
 
         return "post";
     }
 
     @PostMapping("/post/add")
-    public String addPost(int authorId, String title, String text) {
-        User author = userService.findById(authorId);
+    public String addPost(String username, String title, String text) {
+        User author = userService.findByUsername(username);
+        System.out.println(author);
         if (title != null && text != null && author != null) {
             Message newMessage = new Message(text, title, new Date(), author, null);
             messageService.add(newMessage);
@@ -107,5 +138,39 @@ public class PlatformController {
         } else {
             return "redirect:/posts";
         }
+    }
+
+    @GetMapping("/reg")
+    public String regPage(Model model){
+        User user = new User();
+        model.addAttribute("user", user);
+        return "reg";
+    }
+
+    @PostMapping("/reg")
+    public String createUser(Model model, @ModelAttribute("user") User user, BindingResult result, String rePassword){
+        if (!user.getPassword().equals(rePassword)) {
+            result.rejectValue("pswd", "1","Password mismatch");
+        }
+        if (user.getPassword().isEmpty()) {
+            result.rejectValue("pswd_empty", "2","Password is empty");
+        }
+        if (userService.findByUsername(user.getUsername()) != null) {
+            result.rejectValue("username", "3","There is already an account registered with the same username");
+        }
+        if (userService.findByEmail(user.getEmail()) != null) {
+            result.rejectValue("username", "4","There is already an account registered with the same email");
+        }
+        if (!result.hasErrors()) {
+            String username = user.getUsername();
+            String password = passwordEncoder.encode(user.getPassword());
+            String email = user.getEmail();
+            Role role = roleService.findById(Role.ROLE_USER);
+
+            User newUser = new User(username, password, email, role, 1);
+            userService.add(newUser);
+            return "redirect:/login";
+        }
+        return "reg";
     }
 }

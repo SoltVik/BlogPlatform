@@ -57,9 +57,7 @@
                 <div class="basic-login">
                     <form th:action="@{/reg}" role="form" th:object="${user}" method="POST">
                         <div th:if="${#fields.hasAnyErrors()}">
-                            <div class="alert alert-danger" th:each="err : ${#fields.allErrors()}" th:text="${err}" >
-                                Invalid username or password!
-                            </div>
+                            <div class="alert alert-danger" th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
                         </div>
                         <div class="form-group">
                             <label for="register-username"><i class="icon-user"></i> <b>Username</b></label>
@@ -67,7 +65,7 @@
                         </div>
                         <div class="form-group">
                             <label for="register-email"><i class="icon-user"></i> <b>E-mail</b></label>
-                            <input class="form-control" id="register-email" type="text" th:field="*{email}" placeholder="E-mail" required="true">
+                            <input class="form-control" id="register-email" type="email" th:field="*{email}" placeholder="E-mail" required="true">
                         </div>
                         <div class="form-group">
                             <label for="register-password"><i class="icon-lock"></i> <b>Password</b></label>
