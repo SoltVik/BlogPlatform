@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head th:replace="fragments/header :: header('Users')"></head>
+<body>
+
+<!-- Navigation & Logo-->
+<div th:replace="fragments/navigation :: navigation('users')"/>
+</div>
+
+<!-- Page Title -->
+<div th:replace="fragments/header :: pageTitle('Users')"></div>
+
+<div class="section">
+    <div class="container">
+        <div class="row">
+            <div class="pagination-wrapper">
+                <ul class="pagination">
+                    <li><a href="/users">All</a></li>
+                    <li><a href="/users/A">A</a></li>
+                    <li><a href="/users/B">B</a></li>
+                    <li><a href="/users/C">C</a></li>
+                    <li><a href="/users/D">D</a></li>
+                    <li><a href="/users/E">E</a></li>
+                    <li><a href="/users/F">F</a></li>
+                    <li><a href="/users/G">G</a></li>
+                    <li><a href="/users/H">H</a></li>
+                    <li><a href="/users/I">I</a></li>
+                    <li><a href="/users/J">J</a></li>
+                    <li><a href="/users/K">K</a></li>
+                    <li><a href="/users/L">L</a></li>
+                    <li><a href="/users/M">M</a></li>
+                    <li><a href="/users/N">N</a></li>
+                    <li><a href="/users/O">O</a></li>
+                    <li><a href="/users/P">P</a></li>
+                    <li><a href="/users/Q">Q</a></li>
+                    <li><a href="/users/R">R</a></li>
+                    <li><a href="/users/S">S</a></li>
+                    <li><a href="/users/T">T</a></li>
+                    <li><a href="/users/U">U</a></li>
+                    <li><a href="/users/V">V</a></li>
+                    <li><a href="/users/W">W</a></li>
+                    <li><a href="/users/X">X</a></li>
+                    <li><a href="/users/Y">Y</a></li>
+                    <li><a href="/users/Z">Z</a></li>
+                    <li><a href="/users/Num">#</a></li>
+                </ul>
+            </div>
+            <div class='userletter' th:each="users : ${userList}">
+                <div class='usrltrhd'>
+                    <div class='usrltrhd2'><h2 th:text="${#strings.substring(users.get(0).username,0,1)}">Letter</h2></div>
+                </div>
+                <div class='userscl'>
+                    <div class='usernm' th:each="user : ${users}"><p><b th:text="${user.username}">User</b><a sec:authorize="hasRole('STAFF')" data-toggle="modal" th:attr="data-target='#modal-edit-'+${user.id}" th:href="'#' + ${user.id}" title="Edit user">&nbsp;<span class="glyphicon glyphicon-pencil"></span></a></p>
+                        <div class="modal fade" th:id="'modal-edit-'+${user.id}" tabindex="-1" role="dialog" th:attr="aria-labelledby=EditUser + ${user.id}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <h5 class="modal-title" th:id="EditUser + ${user.id}">Edit user</h5>
+                                    </div>
+                                    <div class="modal-body text-left">
+                                        <form th:id="'form-edit-'+${user.id}" th:action="@{/users}" method="POST">
+                                            <div class="form-group">
+                                                <label class="col-form-label" for="editName">Username:</label>
+                                                <input class="form-control" id="editName" name="editName" th:value="${user.username}">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-form-label" for="editEmail">Email:</label>
+                                                <input class="form-control" id="editEmail" name="editEmail" th:value="${user.email}">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-form-label" for="editRole">Role:</label>
+                                                <input class="form-control" id="editRole" name="editEmail" th:value="${user.role.roleName}">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-form-label" for="editEnabled">Enabled:</label>
+                                                <input class="form-control" id="editEnabled" name="editEmail" th:value="${user.enabled}">
+                                            </div>
+                                            <input type="hidden" name="userId" th:value="${user.id}">
+                                            <input type="submit" th:id="'submit-form-edit-'+${user.id}" class="hidden"/>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary pull-left" data-dismiss="modal">Close</button>
+                                        <label type="button" class="btn btn-primary" th:for="'submit-form-edit-'+${user.id}">Edit</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div th:replace="fragments/footer :: footer"></div>
+
+<!-- Javascripts -->
+<div th:replace="fragments/footer :: javascript"></div>
+
+</body>
+</html>

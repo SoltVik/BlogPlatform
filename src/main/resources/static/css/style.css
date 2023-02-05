@@ -553,6 +553,47 @@ a:hover {
   text-align: center;
 }
 /*--------------------------------------------------------------------------
++	Users Page Style
+--------------------------------------------------------------------------*/
+.userletter {
+    float: left;
+    width: 100%;
+    height: auto;
+    padding-bottom: 15px;
+}
+
+.usrltrhd {
+    height: 80px;
+    width: 100%;
+    padding: 0px;
+}
+
+.usrltrhd2 {
+    display: inline-block;
+    height: 58px;
+    margin-top: 18px;
+    margin-left: 20px;
+    float: left;
+}
+
+.usrltrhd2 h2 {
+    margin: 21px;
+}
+
+.userscl {
+    margin: 2px 0px;
+    width: 100%;
+}
+
+.usernm {
+    margin-bottom: 2px;
+    padding: 5px 0;
+    width: 25%;
+    text-align: center;
+    float: left;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+/*--------------------------------------------------------------------------
 +	Main Menu Style
 --------------------------------------------------------------------------*/
 .mainmenu li.logo-wrapper a {

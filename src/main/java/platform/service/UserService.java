@@ -10,9 +10,7 @@ import platform.domain.Role;
 import platform.domain.User;
 import platform.repository.UserRepository;
 
-import java.util.List;
-import java.util.Optional;
-
+import java.util.*;
 
 
 @Service
@@ -64,6 +62,45 @@ public class UserService {
         Message msg = messageService.getById(msgId);
 
         return ((post.getAuthor() == author) || (msg.getAuthor() == author));
+    }
+
+    public List<List<User>> getUserLists() {
+        List<User> users = userRepository.findAllEnabled();
+        List<List<User>> userList = new ArrayList<>();
+        Set<String> letters = new TreeSet<>();
+        for(User user : users) {
+            String let = "" + user.getUsername().toLowerCase().charAt(0);
+            if (let.matches("[0-9]")){
+                let = "#";
+            }
+            letters.add(let);
+        }
+        for (String letter : letters) {
+            List<User> usersByLetter;
+            if (letter.equals("#")) {
+                usersByLetter = userRepository.findAllBySpecSymbol();
+            } else {
+                usersByLetter = userRepository.findAllByLetter(letter);
+            }
+            userList.add(usersByLetter);
+        }
+        return userList;
+    }
+
+    public List<List<User>> getUserListsByLetter(String letter) {
+        List<List<User>> userList = new ArrayList<>();
+        List<User> usersByLetter;
+        if (letter.equalsIgnoreCase("num")) {
+            usersByLetter = userRepository.findAllBySpecSymbol();
+        } else {
+            usersByLetter = userRepository.findAllByLetter(letter.toLowerCase());
+        }
+
+        if (!usersByLetter.isEmpty()) {
+            userList.add(usersByLetter);
+        }
+
+        return userList;
     }
 
     public User update(int idx, UserVO userVO) {

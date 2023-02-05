@@ -19,6 +19,7 @@ import platform.service.MessageService;
 import platform.service.RoleService;
 import platform.service.UserService;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -192,5 +193,21 @@ public class PlatformController {
             return "redirect:/login";
         }
         return "reg";
+    }
+
+    @GetMapping("/users")
+    public String userPage(Model model) {
+        List<List<User>> userList = userService.getUserLists();
+        model.addAttribute("userList", userList);
+        return "users";
+    }
+
+    @GetMapping("/users/{letter}")
+    public String userPageLetter(Model model, @PathVariable String letter) {
+        //System.out.println(letter);
+       List<List<User>> userList = userService.getUserListsByLetter(letter);
+        //List<List<User>> userList = new ArrayList<List<User>>();
+        model.addAttribute("userList", userList);
+        return "users";
     }
 }
