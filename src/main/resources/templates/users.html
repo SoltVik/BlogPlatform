@@ -50,7 +50,11 @@
                     <div class='usrltrhd2'><h2 th:text="${#strings.substring(users.get(0).username,0,1)}">Letter</h2></div>
                 </div>
                 <div class='userscl'>
-                    <div class='usernm' th:each="user : ${users}"><p><b th:text="${user.username}">User</b><a sec:authorize="hasRole('STAFF')" data-toggle="modal" th:attr="data-target='#modal-edit-'+${user.id}" th:href="'#' + ${user.id}" title="Edit user">&nbsp;<span class="glyphicon glyphicon-pencil"></span></a></p>
+                    <div class='usernm' th:each="user : ${users}">
+                        <p><b th:text="${user.username}">User</b>
+                        <a sec:authorize="hasRole('USER')" th:if="${userService.findByUsername(#authentication.name).id == user.id}" data-toggle="modal" th:attr="data-target='#modal-edit-'+${user.id}" th:href="'#' + ${user.id}" title="Edit user">&nbsp;<span class="glyphicon glyphicon-pencil"></span></a>
+                        <a sec:authorize="hasRole('STAFF')" th:unless="${userService.findByUsername(#authentication.name).id == user.id}" data-toggle="modal" th:attr="data-target='#modal-edit-'+${user.id}" th:href="'#' + ${user.id}" title="Edit user">&nbsp;<span class="glyphicon glyphicon-pencil"></span></a>
+                    </p>
                         <div class="modal fade" th:id="'modal-edit-'+${user.id}" tabindex="-1" role="dialog" th:attr="aria-labelledby=EditUser + ${user.id}" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -64,21 +68,31 @@
                                         <form th:id="'form-edit-'+${user.id}" th:action="@{/users}" method="POST">
                                             <div class="form-group">
                                                 <label class="col-form-label" for="editName">Username:</label>
-                                                <input class="form-control" id="editName" name="editName" th:value="${user.username}">
+                                                <input class="form-control" th:disabled="${userService.findByUsername(#authentication.name).role.id != 1}" id="editName" name="editName" th:value="${user.username}">
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-form-label" for="editEmail">Email:</label>
                                                 <input class="form-control" id="editEmail" name="editEmail" th:value="${user.email}">
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-form-label" for="editRole">Role:</label>
-                                                <input class="form-control" id="editRole" name="editEmail" th:value="${user.role.roleName}">
+                                                <label class="col-form-label" for="editPassowrd">Password:</label>
+                                                <input type="password" class="form-control" id="editPassowrd" name="editPassword">
                                             </div>
-                                            <div class="form-group">
+                                            <div class="form-group" sec:authorize="hasRole('ADMIN')">
+                                                <label class="col-form-label" for="editRole">Role:</label>
+                                                <select name="editRole" id="editRole">
+                                                    <option th:each="rol : ${roles}" th:selected="${rol.id} == ${user.role.id}" th:value="${rol.id}" th:text="${rol.roleName}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group" sec:authorize="hasRole('STAFF')">
                                                 <label class="col-form-label" for="editEnabled">Enabled:</label>
-                                                <input class="form-control" id="editEnabled" name="editEmail" th:value="${user.enabled}">
+                                                <input type="checkbox" id="editEnabled" name="editEnabled" th:value="${user.enabled}" th:checked="${user.enabled}==1">
                                             </div>
                                             <input type="hidden" name="userId" th:value="${user.id}">
+                                            <div sec:authorize="hasRole('ADMIN')">
+                                                <input type="hidden" name="isAdmin" th:value="true">
+                                            </div>
+
                                             <input type="submit" th:id="'submit-form-edit-'+${user.id}" class="hidden"/>
                                         </form>
                                     </div>

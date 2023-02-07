@@ -5,8 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,9 +21,7 @@ import platform.service.MessageService;
 import platform.service.RoleService;
 import platform.service.UserService;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class PlatformController {
@@ -197,17 +197,77 @@ public class PlatformController {
 
     @GetMapping("/users")
     public String userPage(Model model) {
-        List<List<User>> userList = userService.getUserLists();
+        List<List<User>> userList = userService.getUserLists(hasRole("ROLE_ADMIN"));
+        List<Role> roles = roleService.getAll();
         model.addAttribute("userList", userList);
+        model.addAttribute("userService", userService);
+        model.addAttribute("roles", roles);
         return "users";
+    }
+
+
+    @PostMapping("/users")
+    public String editUser(Optional<String> editName, String editEmail, String editPassword, Integer editRole, boolean editEnabled, int userId, boolean isAdmin) {
+        if (!editEmail.isEmpty()) {
+            User oldUser = userService.findById(userId);
+            if (oldUser == null) {
+                return "redirect:/users";
+            }
+
+            User user;
+            if (isAdmin && editName.isPresent()) {
+                user = userService.findByUsername(editName.get());
+                if (user != null) {;
+                    if (user.getId() != oldUser.getId()) {
+                        return "redirect:/users";
+                    }
+                }
+                oldUser.setUsername(editName.get());
+            }
+            if (userService.isValidEmail(editEmail)) {
+                user = userService.findByEmail(editEmail);
+                if (user != null) {;
+                    if (user.getId() != oldUser.getId()) {
+                        return "redirect:/users";
+                    }
+                }
+                oldUser.setEmail(editEmail);
+            }
+
+            if (!editPassword.isEmpty()) {
+                oldUser.setPassword(passwordEncoder.encode(editPassword));
+            }
+            if (isAdmin) {
+                oldUser.setRole(roleService.findById(editRole));
+                oldUser.setEnabled(editEnabled ? 1 : 0);
+            }
+
+            userService.save(oldUser);
+        }
+
+        return "redirect:/users";
     }
 
     @GetMapping("/users/{letter}")
     public String userPageLetter(Model model, @PathVariable String letter) {
-        //System.out.println(letter);
-       List<List<User>> userList = userService.getUserListsByLetter(letter);
-        //List<List<User>> userList = new ArrayList<List<User>>();
+        List<List<User>> userList = userService.getUserListsByLetter(letter, hasRole("ROLE_ADMIN"));
+        List<Role> roles = roleService.getAll();
         model.addAttribute("userList", userList);
-        return "users";
+        model.addAttribute("userService", userService);
+        model.addAttribute("roles", roles);
+       return "users";
+    }
+
+    private boolean hasRole(String role) {
+        Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        boolean hasRole = false;
+        for (GrantedAuthority authority : authorities) {
+            System.out.println(authority);
+            hasRole = authority.getAuthority().equals(role);
+            if (hasRole) {
+                break;
+            }
+        }
+        return hasRole;
     }
 }

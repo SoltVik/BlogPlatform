@@ -11,6 +11,7 @@ import platform.domain.User;
 import platform.repository.UserRepository;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -27,6 +28,12 @@ public class UserService {
     }
 
     public void add(User user) {
+        logger.info("Added user {}", user);
+        userRepository.save(user);
+    }
+
+    public void save(User user) {
+        logger.info("Updated user {}", user);
         userRepository.save(user);
     }
 
@@ -35,12 +42,12 @@ public class UserService {
         return result.orElse(null);
     }
 
-    public User findByUsername (String username){
+    public User findByUsername(String username) {
         User result = userRepository.findByUsername(username);
         return result;
     }
 
-    public User findByEmail (String email){
+    public User findByEmail(String email) {
         User result = userRepository.findByEmail(email);
         return result;
     }
@@ -50,7 +57,7 @@ public class UserService {
         return users;
     }
 
-    public boolean isPermit(int postId, int msgId, String user){
+    public boolean isPermit(int postId, int msgId, String user) {
         User author = findByUsername(user);
         int roleId = author.getRole().getId();
 
@@ -64,13 +71,13 @@ public class UserService {
         return ((post.getAuthor() == author) || (msg.getAuthor() == author));
     }
 
-    public List<List<User>> getUserLists() {
-        List<User> users = userRepository.findAllEnabled();
+    public List<List<User>> getUserLists(boolean isAdmin) {
+        List<User> users = (isAdmin) ? userRepository.findAll() : userRepository.findAllEnabled();
         List<List<User>> userList = new ArrayList<>();
         Set<String> letters = new TreeSet<>();
-        for(User user : users) {
+        for (User user : users) {
             String let = "" + user.getUsername().toLowerCase().charAt(0);
-            if (let.matches("[0-9]")){
+            if (let.matches("[0-9]")) {
                 let = "#";
             }
             letters.add(let);
@@ -78,22 +85,23 @@ public class UserService {
         for (String letter : letters) {
             List<User> usersByLetter;
             if (letter.equals("#")) {
-                usersByLetter = userRepository.findAllBySpecSymbol();
+                usersByLetter = (isAdmin) ? userRepository.findAllBySpecSymbol() : userRepository.findAllEnabledBySpecSymbol();
             } else {
-                usersByLetter = userRepository.findAllByLetter(letter);
+                usersByLetter = (isAdmin) ? userRepository.findAllByLetter(letter) : userRepository.findAllEnabledByLetter(letter);
             }
             userList.add(usersByLetter);
         }
         return userList;
     }
 
-    public List<List<User>> getUserListsByLetter(String letter) {
+    public List<List<User>> getUserListsByLetter(String letter, boolean isAdmin) {
+        letter = letter.toLowerCase();
         List<List<User>> userList = new ArrayList<>();
         List<User> usersByLetter;
         if (letter.equalsIgnoreCase("num")) {
-            usersByLetter = userRepository.findAllBySpecSymbol();
+            usersByLetter = (isAdmin) ? userRepository.findAllBySpecSymbol() : userRepository.findAllEnabledBySpecSymbol();
         } else {
-            usersByLetter = userRepository.findAllByLetter(letter.toLowerCase());
+            usersByLetter = (isAdmin) ? userRepository.findAllByLetter(letter) : userRepository.findAllEnabledByLetter(letter);
         }
 
         if (!usersByLetter.isEmpty()) {
@@ -101,6 +109,16 @@ public class UserService {
         }
 
         return userList;
+    }
+
+    public boolean isValidEmail(String email) {
+        if (email == null) {
+            return false;
+        }
+
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern pat = Pattern.compile(emailRegex);
+        return pat.matcher(email).matches();
     }
 
     public User update(int idx, UserVO userVO) {

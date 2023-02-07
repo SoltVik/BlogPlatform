@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import platform.domain.Role;
 import platform.repository.RoleRepository;
 
+import java.util.List;
+
 @Service
 public class RoleService {
 
@@ -13,5 +15,9 @@ public class RoleService {
 
     public Role findById(int id) {
         return roleRepository.findById(id);
+    }
+
+    public List<Role> getAll() {
+        return roleRepository.findAll();
     }
 }
