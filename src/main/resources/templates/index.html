@@ -53,17 +53,18 @@
     <div class="container">
         <h2>Top Authors</h2>
         <div class="row">
-              <div class="testimonial col-md-4 col-sm-6" th:each="author, state : ${topAuthors}">
+            <div class="testimonial col-md-4 col-sm-6" th:each="author, state : ${topAuthors}">
                 <div class="author-photo">
                     <img th:src="@{/img/user_{id}.png(id=${author.id%5})}">
                 </div>
                 <div class="testimonial-bubble">
-                    <blockquote>
-                        <p class="quote" th:utext="${#strings.abbreviate(randomMessageToTopAuthors.get(state.index).text,150)}"></p>
-                        <cite class="author-info">
-                            - [[${author.username}]],<br>Position <b th:text="${state.count}"></b> in authors top
-                        </cite>
-                    </blockquote>
+                    <div class="in-press press-more">
+                        <a th:href="'post/' + ${randomMessageToTopAuthors.get(state.index).id}"
+                           th:utext="${#strings.abbreviate(randomMessageToTopAuthors.get(state.index).text,150)}"></a>
+                    </div>
+                    <cite class="author-info">
+                        - [[${author.username}]],<br>Position <b th:text="${state.count}"></b> in authors top
+                    </cite>
                     <div class="sprite arrow-speech-bubble"></div>
                 </div>
             </div>

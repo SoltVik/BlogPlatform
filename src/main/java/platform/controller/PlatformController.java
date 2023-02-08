@@ -262,7 +262,6 @@ public class PlatformController {
         Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         boolean hasRole = false;
         for (GrantedAuthority authority : authorities) {
-            System.out.println(authority);
             hasRole = authority.getAuthority().equals(role);
             if (hasRole) {
                 break;
