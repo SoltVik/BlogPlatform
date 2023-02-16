@@ -26,3 +26,7 @@ logging:
   loggingXml: false
   file:
     name: blogging-platform.log
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true

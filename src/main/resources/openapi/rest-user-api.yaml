@@ -30,7 +30,7 @@ paths:
           content:
             application/json:
               schema:
-                type: UserVO
+                type: String
         '404':
           description: Request failed - No items
 
@@ -41,6 +41,25 @@ paths:
       summary: Get all records
       description: Get all records
       operationId: getAll
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: UserVO
+        '404':
+          description: Request failed - No items
+
+  /getAllEnabled:
+    get:
+      tags:
+        - UserRest
+      summary: Get all enabled records
+      description: Get all enabled records
+      operationId: getAllEnabled
       responses:
         '200':
           description: Successful operation
@@ -94,7 +113,7 @@ paths:
           content:
             application/json:
               schema:
-                type: UserVO
+                type: String
         '404':
           description: Request failed - No items
 
@@ -110,6 +129,10 @@ paths:
       responses:
         200:
           description: Successful deleted
+          content:
+            application/json:
+              schema:
+                type: String
         '404':
           description: Request failed - No items
 

@@ -1,0 +1,3 @@
+user_id;username;password;email;role;enabled
+1;Admin;$2a$12$nOhSVLHHXCnGdGW9TXXAQO8/l8ip3LS0L7hUiyaq09zPqy0ZTYUKO;email;1;1
+2;User;$2a$12$CdbochQGjxv/2Fk4WAO94O.vwOsjestnJZ6CC79uLhBHjrFukYdki;email;3;1

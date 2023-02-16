@@ -39,16 +39,28 @@
             <column name="user_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" />
             </column>
-            <column name="name" type="varchar(50)">
+            <column name="username" type="varchar(50)">
                 <constraints nullable="false" />
             </column>
-            <column name="password" type="varchar(50)">
+            <column name="password" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="email" type="varchar(255)" defaultValue="null">
+            <column name="email" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="is_admin" type="boolean" defaultValueBoolean="false">
+            <column name="role" type="int">
+                <constraints nullable="false" />
+            </column>
+            <column name="enabled" type="smallint" defaultValueNumeric="0">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createTable tableName="roles">
+            <column name="role_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="role_name" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
         </createTable>
@@ -70,5 +82,31 @@
                 constraintName="messages_parent_id"
                 referencedTableName="messages"
                 referencedColumnNames="message_id" />
+
+        <addForeignKeyConstraint
+                baseTableName="users" baseColumnNames="role"
+                constraintName="users_role_id"
+                referencedTableName="roles"
+                referencedColumnNames="role_id" />
     </changeSet>
+
+    <changeSet author="Solvik" id="#2">
+        <insert tableName="roles">
+            <column name="role_id" value="1"/>
+            <column name="role_name" value="ROLE_ADMIN"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="role_id" value="2"/>
+            <column name="role_name" value="ROLE_STAFF"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="role_id" value="3"/>
+            <column name="role_name" value="ROLE_USER"/>
+        </insert>
+        <loadData tableName="users"
+                  separator=";"
+                  file="db/data/db_users.csv">
+        </loadData>
+    </changeSet>
+
 </databaseChangeLog>
