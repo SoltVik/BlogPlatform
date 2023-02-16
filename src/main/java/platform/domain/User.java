@@ -1,5 +1,7 @@
 package platform.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -8,6 +10,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="users")
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 public class User {
 
     @Id
@@ -16,7 +19,7 @@ public class User {
     private int id;
 
     @NotEmpty
-    @Size(min = 3, max = 20, message = "Username must be between 10 and 20 characters")
+    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     @Column(name = "username")
     private String username;
 

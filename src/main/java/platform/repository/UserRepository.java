@@ -12,6 +12,9 @@ public interface UserRepository extends CrudRepository<User, Integer> {
 
     List<User> findAll();
 
+    @Query("SELECT u FROM User u WHERE u.id = ?1 AND u.enabled = 1")
+    User findByIdAndIsEnabled(int id);
+
     User findByUsername(String username);
 
     User findByEmail(String email);

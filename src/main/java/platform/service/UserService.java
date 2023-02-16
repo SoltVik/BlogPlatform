@@ -26,6 +26,9 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
+    public List<User> findAllEnabled() {
+        return userRepository.findAllEnabled();
+    }
 
     public void add(User user) {
         logger.info("Added user {}", user);
@@ -38,8 +41,8 @@ public class UserService {
     }
 
     public User findById(int idx) {
-        Optional<User> result = userRepository.findById(idx);
-        return result.orElse(null);
+        User result = userRepository.findByIdAndIsEnabled(idx);
+        return result;
     }
 
     public User findByUsername(String username) {
@@ -142,7 +145,8 @@ public class UserService {
     public boolean remove(int idx) {
         User user = findById(idx);
         if (user != null) {
-            userRepository.delete(user);
+            user.setEnabled(0);
+            userRepository.save(user);
             return true;
         } else {
             return false;

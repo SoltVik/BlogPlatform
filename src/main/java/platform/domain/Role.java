@@ -1,5 +1,7 @@
 package platform.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="roles")
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 public class Role {
 
     public static final int ROLE_ADMIN = 1;
