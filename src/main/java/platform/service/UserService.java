@@ -3,6 +3,7 @@ package platform.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import platform.controller.vo.UserVO;
 import platform.domain.Message;
@@ -12,6 +13,7 @@ import platform.repository.MessageRepository;
 import platform.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -166,5 +168,16 @@ public class UserService {
         } else {
             return false;
         }
+    }
+
+    public boolean hasRole(String role, Collection<GrantedAuthority> authorities) {
+        boolean hasRole = false;
+        for (GrantedAuthority authority : authorities) {
+            hasRole = authority.getAuthority().equals(role);
+            if (hasRole) {
+                break;
+            }
+        }
+        return hasRole;
     }
 }

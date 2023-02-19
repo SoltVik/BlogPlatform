@@ -4,7 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import liquibase.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import platform.controller.vo.MessageVO;
@@ -13,6 +16,7 @@ import platform.domain.User;
 import platform.service.MessageService;
 import platform.service.UserService;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +34,10 @@ public class RestMessageController implements MessageRestApi{
     @Override
     @Operation(summary = "Add new message")
     public ResponseEntity<String> add(MessageVO body) {
+        Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if (!userService.hasRole("ROLE_ADMIN", authorities)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(getJSONMsg(403,"error", "Forbidden", "User do not have permissions"));
+        }
         String text = body.getText();
         String title = body.getTitle();
         Date dateCreate = body.getDateCreate();
@@ -112,6 +120,10 @@ public class RestMessageController implements MessageRestApi{
     @Override
     @Operation(summary = "Restore messages by id")
     public ResponseEntity<String> restore(Integer id) {
+        Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if (!userService.hasRole("ROLE_ADMIN", authorities)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(getJSONMsg(403,"error", "Forbidden", "User do not have permissions"));
+        }
         Message message = messageService.getByIdIncludingDeleted(id);
         if (message != null) {
             Date dateDelete = message.getDateDelete();
@@ -128,6 +140,10 @@ public class RestMessageController implements MessageRestApi{
     @Override
     @Operation(summary = "Update messages by id")
     public ResponseEntity<String> update(Integer id, MessageVO body) {
+        Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if (!userService.hasRole("ROLE_ADMIN", authorities)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(getJSONMsg(403,"error", "Forbidden", "User do not have permissions"));
+        }
         Message old = messageService.getById(id);
         if (old != null) {
             String text = body.getText();
@@ -164,6 +180,10 @@ public class RestMessageController implements MessageRestApi{
     @Override
     @Operation(summary = "Delete messages by id ")
     public ResponseEntity<String> delete(Integer id) {
+        Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if (!userService.hasRole("ROLE_ADMIN", authorities)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(getJSONMsg(403,"error", "Forbidden", "User do not have permissions"));
+        }
         if (messageService.remove(id)) {
             return ResponseEntity.ok(getJSONMsg(200,"success", "OK", "Message with id '" + id + "' successfully deleted"));
         } else {

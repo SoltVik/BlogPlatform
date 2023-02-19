@@ -197,7 +197,8 @@ public class PlatformController {
 
     @GetMapping("/users")
     public String userPage(Model model) {
-        List<List<User>> userList = userService.getUserLists(hasRole("ROLE_ADMIN"));
+        Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        List<List<User>> userList = userService.getUserLists(userService.hasRole("ROLE_ADMIN", authorities));
         List<Role> roles = roleService.getAll();
         model.addAttribute("userList", userList);
         model.addAttribute("userService", userService);
@@ -250,23 +251,12 @@ public class PlatformController {
 
     @GetMapping("/users/{letter}")
     public String userPageLetter(Model model, @PathVariable String letter) {
-        List<List<User>> userList = userService.getUserListsByLetter(letter, hasRole("ROLE_ADMIN"));
+        Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        List<List<User>> userList = userService.getUserListsByLetter(letter, userService.hasRole("ROLE_ADMIN", authorities));
         List<Role> roles = roleService.getAll();
         model.addAttribute("userList", userList);
         model.addAttribute("userService", userService);
         model.addAttribute("roles", roles);
        return "users";
-    }
-
-    private boolean hasRole(String role) {
-        Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        boolean hasRole = false;
-        for (GrantedAuthority authority : authorities) {
-            hasRole = authority.getAuthority().equals(role);
-            if (hasRole) {
-                break;
-            }
-        }
-        return hasRole;
     }
 }
