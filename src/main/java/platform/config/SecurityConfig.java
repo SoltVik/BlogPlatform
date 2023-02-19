@@ -10,17 +10,14 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Blog Platform API", version = "1.0", description = "User & Message Details"))
@@ -32,7 +29,7 @@ public class SecurityConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .components(new Components()
-                        .addSecuritySchemes(SCHEME_NAME, createSecurityScheme()))
+                .addSecuritySchemes(SCHEME_NAME, createSecurityScheme()))
                 .addSecurityItem(new SecurityRequirement().addList(SCHEME_NAME));
     }
 
@@ -65,12 +62,10 @@ public class SecurityConfig {
                 .and()
                     .logout()
                     .logoutSuccessUrl("/")
-                    .deleteCookies()
+                    .deleteCookies("JSESSIONID")
                     .permitAll()
                 .and()
-                    .httpBasic()
-                .and()
-                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    .httpBasic();
 
         return http.build();
     }
