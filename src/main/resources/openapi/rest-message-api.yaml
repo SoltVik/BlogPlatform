@@ -30,7 +30,7 @@ paths:
           content:
             application/json:
               schema:
-                type: MessageVO
+                type: String
         '404':
           description: Request failed - No items
 
@@ -94,6 +94,48 @@ paths:
         '404':
           description: Request failed - No items
 
+  /getLastPosts/{amount}:
+    get:
+      tags:
+        - MessageRest
+      summary: Get latest posts
+      description: Get latest posts
+      operationId: getLastPosts
+      parameters:
+        - $ref: '#/components/parameters/amount'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: MessageVO
+        '404':
+          description: Request failed - No items
+
+  /getLastComments/{amount}:
+    get:
+      tags:
+        - MessageRest
+      summary: Get latest comments
+      description: Get latest comments
+      operationId: getLastComments
+      parameters:
+        - $ref: '#/components/parameters/amount'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: MessageVO
+        '404':
+          description: Request failed - No items
+
   /update/{id}:
     put:
       tags:
@@ -116,7 +158,7 @@ paths:
           content:
             application/json:
               schema:
-                type: MessageVO
+                type: String
         '404':
           description: Request failed - No items
 
@@ -131,7 +173,30 @@ paths:
         - $ref: '#/components/parameters/id'
       responses:
         200:
-          description: Successful deleted
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                type: String
+        '404':
+          description: Request failed - No items
+
+  /restore/{id}:
+    put:
+      tags:
+        - MessageRest
+      summary: Restore one record by id
+      description: Restore one record by id
+      operationId: restore
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: Successfully restored
+          content:
+            application/json:
+              schema:
+                type: String
         '404':
           description: Request failed - No items
 
@@ -143,5 +208,12 @@ components:
       name: id
       required: true
       description: record id
+      schema:
+        type: integer
+    amount:
+      in: path
+      name: amount
+      required: true
+      description: amount of records
       schema:
         type: integer

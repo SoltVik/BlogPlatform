@@ -10,8 +10,8 @@ import platform.controller.vo.MessageVO;
 import platform.domain.Message;
 import platform.domain.User;
 import platform.repository.MessageRepository;
+import platform.repository.UserRepository;
 
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +21,8 @@ public class MessageService {
 
     @Autowired
     private MessageRepository messageRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public List<Message> getAll() {
         return messageRepository.findAll();
@@ -41,6 +43,11 @@ public class MessageService {
 
     public Message getById(Integer idx) {
         Optional<Message> result = messageRepository.findByIdAndDateDeleteIsNull(idx);
+        return result.orElse(null);
+    }
+
+    public Message getByIdIncludingDeleted(Integer id) {
+        Optional<Message> result = messageRepository.findById(id);
         return result.orElse(null);
     }
 
@@ -131,23 +138,24 @@ public class MessageService {
         return getPostByComment(message.getParentId());
     }
 
-
     public Message update(int idx, MessageVO messageVO) {
-        Message old = messageRepository.findById(idx).get();
-        old.setText(messageVO.getText());
-        old.setTitle(messageVO.getTitle());
-        old.setDateEdit(new Timestamp(System.currentTimeMillis()));
-        old.setEditor(messageVO.getEditorId());
-        old.setParent(messageVO.getParent());
+        Message old = messageRepository.findById(idx).orElse(null);
+        if (old != null) {
+            old.setText(messageVO.getText());
+            old.setTitle(messageVO.getTitle());
+            old.setDateEdit(new Date());
+            old.setEditor(userRepository.findByIdAndIsEnabled(messageVO.getEditorId()));
+            old.setParent(getById(messageVO.getParentId()));
 
-        return messageRepository.save(old);
+            return messageRepository.save(old);
+        }
+        return null;
     }
 
     public boolean remove(Integer idx) {
         Message message = getById(idx);
         if (message != null) {
             logger.info("Removed message {}", message);
-            //messageRepository.delete(message);
             message.setDateDelete(new Date());
             messageRepository.save(message);
             return true;

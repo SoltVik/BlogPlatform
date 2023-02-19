@@ -1,24 +1,45 @@
 package platform.controller.vo;
 
 import platform.domain.Message;
-import platform.domain.User;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 public class MessageVO {
 
     private int id;
+
+    @NotNull(message = "Text cannot be null")
+    @Size(min = 10, message= "Text must be minimum 10 characters")
     private String text;
+
+    @NotNull(message = "Title cannot be null")
+    @Size(min = 5, max = 200, message= "Title must be between 5 and 200 characters")
     private String title;
+
+    @PastOrPresent
     private Date dateCreate;
+
+    @PastOrPresent
     private Date dateEdit;
+
+    @PastOrPresent
     private Date dateDelete;
-    private User authorId;
-    private User editorId;
-    private Message parent;
+
+    @NotNull
+    @Positive
+    private Integer authorId;
+
+    @Positive
+    private Integer editorId;
+
+    @Positive
     private Integer parentId;
 
-    public MessageVO(int id, String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, User authorId, User editorId, Integer parentId) {
+    public MessageVO(int id, String text, String title, Date dateCreate, Date dateEdit, Date dateDelete, Integer authorId, Integer editorId, Integer parentId) {
         this.id = id;
         this.text = text;
         this.title = title;
@@ -28,10 +49,6 @@ public class MessageVO {
         this.authorId = authorId;
         this.editorId = editorId;
         this.parentId = parentId;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getText() {
@@ -54,16 +71,12 @@ public class MessageVO {
         return dateDelete;
     }
 
-    public User getAuthorId() {
+    public Integer getAuthorId() {
         return authorId;
     }
 
-    public User getEditorId() {
+    public Integer getEditorId() {
         return editorId;
-    }
-
-    public Message getParent() {
-        return parent;
     }
 
     public Integer getParentId() {
@@ -71,6 +84,6 @@ public class MessageVO {
     }
 
     public static MessageVO valueOf(Message message) {
-        return new MessageVO(message.getId(), message.getText(), message.getTitle(), message.getDateCreate(), message.getDateEdit(), message.getDateDelete(), message.getAuthor(), message.getEditor(), message.getParentId());
+        return new MessageVO(message.getId(), message.getText(), message.getTitle(), message.getDateCreate(), message.getDateEdit(), message.getDateDelete(), message.getAuthor().getId(), (message.getEditor() == null) ? null : message.getEditor().getId(), message.getParentId());
     }
 }
