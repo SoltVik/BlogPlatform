@@ -27,6 +27,11 @@ public class MessageService {
     public List<Message> getAll() {
         return messageRepository.findAll();
     }
+
+    public List<Message> getAllEnabled() {
+        return messageRepository.findAllAndDateDeleteIsNull();
+    }
+
     public Page<Message> findAll(Pageable pageable) {
         return messageRepository.findAll(pageable);
     }
