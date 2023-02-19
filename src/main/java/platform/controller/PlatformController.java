@@ -209,7 +209,7 @@ public class PlatformController {
     @PostMapping("/users")
     public String editUser(Optional<String> editName, String editEmail, String editPassword, Integer editRole, boolean editEnabled, int userId, boolean isAdmin) {
         if (!editEmail.isEmpty()) {
-            User oldUser = userService.findById(userId);
+            User oldUser = userService.findEnabledById(userId);
             if (oldUser == null) {
                 return "redirect:/users";
             }

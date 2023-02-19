@@ -14,6 +14,7 @@ import platform.domain.User;
 import platform.service.RoleService;
 import platform.service.UserService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,37 +39,37 @@ public class RestUserController implements UserRestApi {
         Role role = roleService.findById(body.getRoleId());
         int enabled = body.getEnabled();
         if (userService.findByUsername(username) != null) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "User already exist"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "User already exist"));
         }
         if (password.isEmpty()) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "Password is empty"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Password is empty"));
         }
 
         if (!userService.isValidEmail(email)) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "Email is invalid"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Email is invalid"));
         }
         if (userService.findByEmail(email) != null) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "Email already exist"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Email already exist"));
         }
         if (role == null) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "Role can not be found"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Role can not be found"));
         }
         if (enabled != 0 && enabled != 1) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "Use: 0 - disabled, 1 - enabled"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Use: 0 - disabled, 1 - enabled"));
         }
 
         if (!StringUtil.isEmpty(username) && !StringUtil.isEmpty(password) && !StringUtil.isEmpty(email) && (enabled >= 0)) {
             User newUser = new User(username, passwordEncoder.encode(body.getPassword()), email, role, enabled);
             userService.add(newUser);
-            return ResponseEntity.ok(getJSONMsg("success", "User '" + username + "' successfully created"));
+            return ResponseEntity.ok(getJSONMsg(200,"success", "OK", "User '" + username + "' successfully created"));
         }
-        return ResponseEntity.badRequest().body(getJSONMsg("error", "Check all fields and try again"));
+        return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Check all fields and try again"));
     }
 
     @Override
-    @Operation(summary = "Find user by id")
+    @Operation(summary = "Get user by id")
     public ResponseEntity<UserVO> get(Integer id) {
-        User user = userService.findById(id);
+        User user = userService.findEnabledById(id);
         if (user != null) {
             return ResponseEntity.ok(UserVO.valueOf(user));
         } else {
@@ -77,24 +78,60 @@ public class RestUserController implements UserRestApi {
     }
 
     @Override
-    @Operation(summary = "Find all users")
+    @Operation(summary = "Get all users")
     public ResponseEntity<List<UserVO>> getAll() {
         List<User> users = userService.findAll();
         List<UserVO> userVO = users.stream()
-                .map(e -> UserVO.valueOf(e))
+                .map(u -> UserVO.valueOf(u))
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok(userVO);
     }
 
     @Override
-    @Operation(summary = "Find all enabled users")
+    @Operation(summary = "Get all enabled users")
     public ResponseEntity<List<UserVO>> getAllEnabled() {
         List<User> users = userService.findAllEnabled();
         List<UserVO> userVO = users.stream()
-                .map(e -> UserVO.valueOf(e))
+                .map(u -> UserVO.valueOf(u))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(userVO);
+    }
+
+    @Override
+    @Operation(summary = "Get user by username")
+    public ResponseEntity<UserVO> getByUsername(String username) {
+        User user = userService.findByUsername(username);
+        if (user != null) {
+            return ResponseEntity.ok(UserVO.valueOf(user));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
+    @Operation(summary = "Get users with the most posts")
+    public ResponseEntity<List<UserVO>> getTopAuthors(Integer amount) {
+        List<User> users = userService.getTopAuthors(amount);
+        List<UserVO> userVO = users.stream()
+                .map(u -> UserVO.valueOf(u))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userVO);
+    }
+
+    @Override
+    @Operation(summary = "Restore user by id")
+    public ResponseEntity<String> restore(Integer id) {
+        User user = userService.findById(id);
+        if (user != null) {
+            int enabled = user.getEnabled();
+            if (enabled != 0) {
+               return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "User with id: '" + id + "' not disabled"));
+            }
+            user.setEnabled(1);
+            userService.save(user);
+            return ResponseEntity.ok(getJSONMsg(200,"success", "OK", "User with id '" + id + "' successfully restored"));
+        }
+        return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "User with id: '" + id + "' not exist"));
     }
 
     @Override
@@ -110,29 +147,29 @@ public class RestUserController implements UserRestApi {
         User user = userService.findByUsername(username);
         if (user != null) {
             if (user.getId() != id) {
-                return ResponseEntity.badRequest().body(getJSONMsg("error", "Username: '" + username + "' already exist"));
+                return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Username: '" + username + "' already exist"));
             }
         }
         if (password.isEmpty()) {
             changePassword = false;
         }
         if (!userService.isValidEmail(email)) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "Email is invalid"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Email is invalid"));
         }
         user = userService.findByEmail(email);
         if (user != null) {
             if (user.getId() != id) {
-                return ResponseEntity.badRequest().body(getJSONMsg("error", "Email: '" + email + "' already exist"));
+                return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Email: '" + email + "' already exist"));
             }
         }
         if (role == null) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "Role can not be found"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Role can not be found"));
         }
         if (enabled != 0 && enabled != 1) {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "Use: 0 - disabled, 1 - enabled"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Use: 0 - disabled, 1 - enabled"));
         }
         if (!StringUtil.isEmpty(username) && !StringUtil.isEmpty(email)) {
-            User oldUser = userService.findById(id);
+            User oldUser = userService.findEnabledById(id);
             oldUser.setUsername(username);
             oldUser.setEmail(email);
             if (changePassword) {
@@ -141,25 +178,27 @@ public class RestUserController implements UserRestApi {
             oldUser.setRole(role);
             oldUser.setEnabled(enabled);
             userService.save(oldUser);
-            return ResponseEntity.ok(getJSONMsg("success", "User with id '" + id + "' successfully updated"));
+            return ResponseEntity.ok(getJSONMsg(200,"success", "OK", "User with id '" + id + "' successfully updated"));
         }
-        return ResponseEntity.badRequest().body(getJSONMsg("error", "Check all fields and try again"));
+        return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request", "Check all fields and try again"));
     }
 
     @Override
-    @Operation(summary = "Delete user")
+    @Operation(summary = "Delete user by id")
     public ResponseEntity<String> delete(Integer id) {
         if (userService.remove(id)) {
-            return ResponseEntity.ok(getJSONMsg("success", "User with id '" + id + "' successfully deleted"));
+            return ResponseEntity.ok(getJSONMsg(200,"success", "OK","User with id '" + id + "' successfully deleted"));
         } else {
-            return ResponseEntity.badRequest().body(getJSONMsg("error", "User with id '" + id + "' not found"));
+            return ResponseEntity.badRequest().body(getJSONMsg(400,"error", "Bad Request","User with id '" + id + "' not found"));
         }
     }
 
-    private String getJSONMsg(String status, String msg) {
+    private String getJSONMsg(int status, String state, String stateMsg, String msg) {
         return "{\n" +
-                "\" " + status + " \" : " +
-                "\" " + msg + " \"" +
+                "\"timestamp\": \"" + new Date() + "\",\n" +
+                "\"status\": " + status + ",\n" +
+                "\"" + state + "\": \"" + stateMsg + "\",\n" +
+                "\"message\": \"" + msg + "\"" +
                 "\n}";
     }
 }

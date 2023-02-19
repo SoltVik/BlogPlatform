@@ -72,6 +72,28 @@ paths:
         '404':
           description: Request failed - No items
 
+
+  /getTopAuthors/{amount}:
+    get:
+      tags:
+        - UserRest
+      summary: Get top authors
+      description: Get users with the most posts
+      operationId: getTopAuthors
+      parameters:
+        - $ref: '#/components/parameters/amount'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: UserVO
+        '404':
+          description: Request failed - No items
+
   /get/{id}:
     get:
       tags:
@@ -81,6 +103,25 @@ paths:
       operationId: get
       parameters:
         - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: UserVO
+        '404':
+          description: Request failed - No items
+
+  /getByUsername/{username}:
+    get:
+      tags:
+        - UserRest
+      summary: Get one record by username
+      description: Get one record by username
+      operationId: getByUsername
+      parameters:
+        - $ref: '#/components/parameters/username'
       responses:
         '200':
           description: Successful operation
@@ -128,7 +169,26 @@ paths:
         - $ref: '#/components/parameters/id'
       responses:
         200:
-          description: Successful deleted
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                type: String
+        '404':
+          description: Request failed - No items
+
+  /restore/{id}:
+    put:
+      tags:
+        - UserRest
+      summary: Restore one record by id
+      description: Restore one record by id
+      operationId: restore
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        200:
+          description: Successfully restored
           content:
             application/json:
               schema:
@@ -145,3 +205,17 @@ components:
       description: record id
       schema:
         type: integer
+    amount:
+      in: path
+      name: amount
+      required: true
+      description: amount of records
+      schema:
+        type: integer
+    username:
+      in: path
+      name: username
+      required: true
+      description: record username
+      schema:
+        type: String

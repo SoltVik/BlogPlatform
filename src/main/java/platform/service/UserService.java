@@ -8,9 +8,13 @@ import platform.controller.vo.UserVO;
 import platform.domain.Message;
 import platform.domain.Role;
 import platform.domain.User;
+import platform.repository.MessageRepository;
 import platform.repository.UserRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 
@@ -21,7 +25,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    MessageService messageService;
+    private MessageRepository messageRepository;
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -41,6 +45,11 @@ public class UserService {
     }
 
     public User findById(int idx) {
+        User result = userRepository.findById(idx).orElse(null);
+        return result;
+    }
+
+    public User findEnabledById(int idx) {
         User result = userRepository.findByIdAndIsEnabled(idx);
         return result;
     }
@@ -56,7 +65,7 @@ public class UserService {
     }
 
     public List<User> getTopAuthors(int num) {
-        List<User> users = userRepository.getTopAuthors(3);
+        List<User> users = userRepository.getTopAuthors(num);
         return users;
     }
 
@@ -68,8 +77,8 @@ public class UserService {
             return true;
         }
 
-        Message post = messageService.getById(postId);
-        Message msg = messageService.getById(msgId);
+        Message post = messageRepository.findByIdAndDateDeleteIsNull(postId).orElse(null);
+        Message msg =  messageRepository.findByIdAndDateDeleteIsNull(msgId).orElse(null);
 
         return ((post.getAuthor() == author) || (msg.getAuthor() == author));
     }
@@ -125,25 +134,31 @@ public class UserService {
     }
 
     public User update(int idx, UserVO userVO) {
-        User old = userRepository.findById(idx).get();
-        old.setUsername(userVO.getUsername());
-        old.setPassword(userVO.getPassword());
-        old.setEmail(userVO.getEmail());
-        return userRepository.save(old);
+        User old = userRepository.findById(idx).orElse(null);
+        if (old != null) {
+            old.setUsername(userVO.getUsername());
+            old.setPassword(userVO.getPassword());
+            old.setEmail(userVO.getEmail());
+            return userRepository.save(old);
+        }
+        return null;
     }
 
     public User update(int idx, UserVO userVO, boolean changePassword) {
-        User old = userRepository.findById(idx).get();
-        old.setUsername(userVO.getUsername());
-        if (changePassword) {
-            old.setPassword(userVO.getPassword());
+        User old = userRepository.findById(idx).orElse(null);
+        if (old != null) {
+            old.setUsername(userVO.getUsername());
+            if (changePassword) {
+                old.setPassword(userVO.getPassword());
+            }
+            old.setEmail(userVO.getEmail());
+            return userRepository.save(old);
         }
-        old.setEmail(userVO.getEmail());
-        return userRepository.save(old);
+        return null;
     }
 
     public boolean remove(int idx) {
-        User user = findById(idx);
+        User user = findEnabledById(idx);
         if (user != null) {
             user.setEnabled(0);
             userRepository.save(user);

@@ -20,6 +20,7 @@ public class UserVO {
     private String email;
 
     @NotNull
+    @Positive
     private int roleId;
 
     @NotNull
