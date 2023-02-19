@@ -12,12 +12,14 @@
                 <li th:classappend="${page == 'users'} ? 'active'">
                     <a href="/users">Users</a>
                 </li>
+                <li>
+                    <a href="/swagger-ui/index.html">Swagger</a>
+                </li>
                 <li sec:authorize="hasRole('ANONYMOUS')" th:classappend="${page == 'login'} ? 'active'">
                     <a href="/login">Log In</a>
                 </li>
                 <li sec:authorize="isAuthenticated()">
                     <a th:href="@{/logout}">Sign Out [ <span sec:authentication="name"></span> ]</a>
-                    Roles: <span sec:authentication="principal.authorities"></span>
                 </li>
             </ul>
         </nav>
